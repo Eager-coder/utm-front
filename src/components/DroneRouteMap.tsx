@@ -29,7 +29,7 @@ const libraries: Libraries = ['geometry']
 export default function DroneRouteMap() {
   const { isLoaded, loadError } = useJsApiLoader({
     id: 'google-map-script',
-    googleMapsApiKey: 'AIzaSyCpgxgjPup0HNUOrumFBtDFiZNit-rGWf8',
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAP_API_KEY,
     libraries,
   })
 
