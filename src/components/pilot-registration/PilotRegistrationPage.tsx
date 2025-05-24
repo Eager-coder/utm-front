@@ -2,6 +2,11 @@
 import React, { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useQuery, useMutation } from '@tanstack/react-query'
+import apiClient from '@/api/apiClient'
+import {
+  getOrganizations,
+  type Organization,
+} from '@/api/organizations/getOrganizations'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -11,87 +16,107 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
 
-type Organization = {
-  id: string
-  name: string
-}
-
-type FormData = {
-  fullName: string
+// Form payload shapes matching API
+interface SoloPayload {
+  full_name: string
   email: string
-  phone: string
-  independent: boolean
-  orgMember: boolean
-  orgId?: string
-  orgDetails?: string
+  password: string
+  phone_number: string
+  iin: string
 }
 
-async function fetchOrgs(): Promise<Organization[]> {
-  const res = await fetch('/api/organizations')
-  if (!res.ok) throw new Error('Failed to load organizations')
-  return res.json()
-}
-
-async function submitRegistration(data: FormData) {
-  const res = await fetch('/api/pilot-registration', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  })
-  if (!res.ok) throw new Error('Registration failed')
-  return res.json()
+interface OrgPayload extends SoloPayload {
+  organization_id: number
 }
 
 export function PilotRegistrationPage() {
   const navigate = useNavigate()
 
-  // ← useQuery with single options object
+  // form state
+  const [fullName, setFullName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [phone, setPhone] = useState('')
+  const [iin, setIin] = useState('')
+  const [independent, setIndependent] = useState(false)
+  const [orgMember, setOrgMember] = useState(false)
+  const [orgId, setOrgId] = useState<number | null>(null)
+
+  // fetch organization list
   const { data: orgs = [], isLoading: orgsLoading } = useQuery({
-    queryKey: ['orgs'],
-    queryFn: fetchOrgs,
+    queryKey: ['organizations'],
+    queryFn: () => getOrganizations(),
   })
 
-  // ← useMutation with single options object
-  const mutation = useMutation({
-    mutationFn: submitRegistration,
+  // mutation for solo pilot
+  const soloMutation = useMutation({
+    mutationFn: (payload: SoloPayload) =>
+      apiClient.post('/auth/register/solo-pilot', payload),
     onSuccess: () => {
+      toast.success('Solo pilot registered!')
       navigate({ to: '/pilot-registration/success' })
+    },
+    onError: (error: any) => {
+      toast.error(
+        error?.response?.data?.message ||
+          (error instanceof Error ? error.message : 'Registration failed'),
+      )
     },
   })
 
-  const [fullName, setFullName] = useState('')
-  const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
-  const [independent, setIndependent] = useState(false)
-  const [orgMember, setOrgMember] = useState(false)
-  const [orgId, setOrgId] = useState<string | undefined>(undefined)
-  const [orgDetails, setOrgDetails] = useState('')
+  // mutation for organization pilot
+  const orgMutation = useMutation({
+    mutationFn: (payload: OrgPayload) =>
+      apiClient.post('/auth/register/organization-pilot', payload),
+    onSuccess: () => {
+      toast.success('Organization pilot registered!')
+      navigate({ to: '/pilot-registration/success' })
+    },
+    onError: (error: any) => {
+      toast.error(
+        error?.response?.data?.message ||
+          (error instanceof Error ? error.message : 'Registration failed'),
+      )
+    },
+  })
 
-  const onSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    mutation.mutate({
-      fullName,
+
+    const base = {
+      full_name: fullName,
       email,
-      phone,
-      independent,
-      orgMember,
-      orgId,
-      orgDetails,
-    })
+      password,
+      phone_number: phone,
+      iin,
+    }
+
+    if (independent) {
+      soloMutation.mutate(base)
+    } else if (orgMember && orgId !== null) {
+      orgMutation.mutate({ ...(base as SoloPayload), organization_id: orgId })
+    } else {
+      toast.error(
+        'Please select either Independent or Organization member and fill required fields.',
+      )
+    }
   }
+
+  const isSubmitting = soloMutation.isPending || orgMutation.isPending
 
   return (
     <div className="max-w-md mx-auto p-6 space-y-6 bg-white rounded-lg shadow">
       <h1 className="text-2xl font-semibold">Pilot Registration</h1>
 
-      <form onSubmit={onSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <Input
           placeholder="Full name"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
+          required
         />
 
         <Input
@@ -99,6 +124,15 @@ export function PilotRegistrationPage() {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+
+        <Input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
         />
 
         <Input
@@ -106,68 +140,63 @@ export function PilotRegistrationPage() {
           placeholder="Phone number"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
+          required
+        />
+
+        <Input
+          placeholder="IIN"
+          value={iin}
+          onChange={(e) => setIin(e.target.value)}
+          required
         />
 
         <div className="space-y-2">
-          <div className="flex items-center">
+          <label className="flex items-center">
             <Checkbox
-              id="independent"
               checked={independent}
-              onCheckedChange={(checked) => setIndependent(!!checked)}
-            />
-            <label htmlFor="independent" className="ml-2">
-              Independent pilot
-            </label>
-          </div>
-
-          <div className="flex items-center">
-            <Checkbox
-              id="orgMember"
-              checked={orgMember}
-              onCheckedChange={(checked) => {
-                setOrgMember(!!checked)
-                if (!checked) {
-                  setOrgId(undefined)
-                  setOrgDetails('')
-                }
+              onCheckedChange={(c) => {
+                setIndependent(!!c)
+                if (c) setOrgMember(false)
               }}
             />
-            <label htmlFor="orgMember" className="ml-2">
-              Organization member (select below)
-            </label>
-          </div>
+            <span className="ml-2">Independent pilot</span>
+          </label>
+
+          <label className="flex items-center">
+            <Checkbox
+              checked={orgMember}
+              onCheckedChange={(c) => {
+                setOrgMember(!!c)
+                if (c) setIndependent(false)
+                if (!c) setOrgId(null)
+              }}
+            />
+            <span className="ml-2">Organization member</span>
+          </label>
         </div>
 
         {orgMember && (
-          <div className="space-y-3">
-            <Select
-              onValueChange={setOrgId}
-              value={orgId}
-              disabled={orgsLoading}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select org" />
-              </SelectTrigger>
-              <SelectContent>
-                {orgs.map((org) => (
-                  <SelectItem key={org.id} value={org.id}>
-                    {org.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Textarea
-              placeholder="Organization details..."
-              value={orgDetails}
-              onChange={(e) => setOrgDetails(e.target.value)}
-              rows={4}
-            />
-          </div>
+          <Select
+            onValueChange={(val) => setOrgId(Number(val))}
+            value={orgId?.toString()}
+            disabled={orgsLoading}
+            required
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select organization" />
+            </SelectTrigger>
+            <SelectContent>
+              {orgs.map((org: Organization) => (
+                <SelectItem key={org.id} value={org.id.toString()}>
+                  {org.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         )}
 
-        <Button type="submit" disabled={mutation.isPending} className="w-full">
-          {mutation.isPending ? 'Submitting…' : 'Submit'}
+        <Button type="submit" disabled={isSubmitting} className="w-full">
+          {isSubmitting ? 'Submitting…' : 'Submit'}
         </Button>
       </form>
     </div>

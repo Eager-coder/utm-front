@@ -9,24 +9,7 @@ import {
   TableRow,
   TableCell,
 } from '@/components/ui/table'
-
-type Organization = {
-  id: number
-  name: string
-  type: 'ORG' | 'SOLO'
-  drones: number
-}
-
-const fetchOrganizations = async (): Promise<Organization[]> => {
-  // TODO: replace with real API call, e.g.:
-  // return fetch('/api/reg-authority/organizations').then(res => res.json())
-  return [
-    { id: 1, name: 'ORG_NAME1', type: 'ORG', drones: 4 },
-    { id: 2, name: 'ORG_NAME2', type: 'ORG', drones: 15 },
-    { id: 3, name: 'SOLO_RAPIST', type: 'SOLO', drones: 3 },
-    { id: 4, name: 'ORG_NAME3', type: 'ORG', drones: 7 },
-  ]
-}
+import { getOrganizations } from '@/api/organizations/getOrganizations'
 
 export const Route = createFileRoute('/reg-authority/organizations')({
   component: RouteComponent,
@@ -38,8 +21,8 @@ function RouteComponent() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ['reg-authority', 'organizations'],
-    queryFn: fetchOrganizations,
+    queryKey: ['organizations'],
+    queryFn: () => getOrganizations(),
   })
 
   if (isLoading) {
@@ -71,8 +54,8 @@ function RouteComponent() {
               <TableCell>
                 {org.id}. {org.name}
               </TableCell>
-              <TableCell>{org.type}</TableCell>
-              <TableCell>{org.drones}</TableCell>
+              <TableCell>{org.is_active}</TableCell>
+              <TableCell>{org.bin}</TableCell>
             </TableRow>
           ))}
         </TableBody>

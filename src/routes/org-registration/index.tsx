@@ -17,16 +17,20 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { toast } from 'sonner'
+import apiClient from '@/api/apiClient'
 
 // ────────────────────────────────────────────────────────────────────────────────
 // 1️⃣  Schema & Type -----------------------------------------------------------------
 const registrationSchema = z.object({
-  fullName: z.string().min(2, 'Required'),
-  email: z.string().email('Invalid e-mail'),
-  organizationName: z.string().min(2, 'Required'),
+  name: z.string().min(2, 'Required'),
   bin: z.string().length(12, 'BIN must be 12 digits'),
+  company_address: z.string().min(2, 'Required'),
   city: z.string().min(2, 'Required'),
-  postAddress: z.string().min(2, 'Required'),
+  admin_full_name: z.string().min(2, 'Required'),
+  admin_email: z.string().email('Invalid e-mail'),
+  admin_password: z.string().min(6, 'Password must be at least 6 characters'),
+  admin_phone_number: z.string().min(5, 'Required'),
+  admin_iin: z.string().min(1, 'Required'),
 })
 
 type RegistrationValues = z.infer<typeof registrationSchema>
@@ -34,18 +38,8 @@ type RegistrationValues = z.infer<typeof registrationSchema>
 // ────────────────────────────────────────────────────────────────────────────────
 // 2️⃣  API helper -------------------------------------------------------------------
 async function registerOrganization(data: RegistrationValues) {
-  const res = await fetch('/api/organizations', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  })
-
-  if (!res.ok) {
-    const err = await res.json()
-    throw new Error(err?.message ?? 'Unexpected error')
-  }
-
-  return res.json()
+  const res = await apiClient.post('/auth/register/organization-admin', data)
+  return res.data
 }
 
 // ────────────────────────────────────────────────────────────────────────────────
@@ -61,12 +55,15 @@ function OrganizationRegistrationPage() {
   const form = useForm<RegistrationValues>({
     resolver: zodResolver(registrationSchema),
     defaultValues: {
-      fullName: '',
-      email: '',
-      organizationName: '',
+      name: '',
       bin: '',
+      company_address: '',
       city: '',
-      postAddress: '',
+      admin_full_name: '',
+      admin_email: '',
+      admin_password: '',
+      admin_phone_number: '',
+      admin_iin: '',
     },
   })
 
@@ -90,7 +87,7 @@ function OrganizationRegistrationPage() {
     <div className="flex min-h-screen items-center justify-center bg-muted p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <h1 className="text-2xl font-semibold">Organization registration</h1>
+          <h1 className="text-2xl font-semibold">Organization Registration</h1>
         </CardHeader>
 
         <CardContent>
@@ -100,47 +97,13 @@ function OrganizationRegistrationPage() {
               className="space-y-4"
               noValidate
             >
-              {/* Full name */}
+              {/* Organization Name */}
               <FormField
                 control={form.control}
-                name="fullName"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Full name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="John Doe" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Email */}
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="john@org.kz"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Organization name */}
-              <FormField
-                control={form.control}
-                name="organizationName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Organization name</FormLabel>
+                    <FormLabel>Organization Name</FormLabel>
                     <FormControl>
                       <Input placeholder="Acme Inc." {...field} />
                     </FormControl>
@@ -164,6 +127,21 @@ function OrganizationRegistrationPage() {
                 )}
               />
 
+              {/* Company Address */}
+              <FormField
+                control={form.control}
+                name="company_address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Company Address</FormLabel>
+                    <FormControl>
+                      <Input placeholder="123 Main St." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               {/* City */}
               <FormField
                 control={form.control}
@@ -179,15 +157,83 @@ function OrganizationRegistrationPage() {
                 )}
               />
 
-              {/* Post address */}
+              {/* Admin Full Name */}
               <FormField
                 control={form.control}
-                name="postAddress"
+                name="admin_full_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Post address</FormLabel>
+                    <FormLabel>Admin Full Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Kabanbay Batyr 5/3" {...field} />
+                      <Input placeholder="John Doe" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Admin Email */}
+              <FormField
+                control={form.control}
+                name="admin_email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Admin Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="admin@org.kz"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Admin Password */}
+              <FormField
+                control={form.control}
+                name="admin_password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Admin Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="********"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Admin Phone Number */}
+              <FormField
+                control={form.control}
+                name="admin_phone_number"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Admin Phone Number</FormLabel>
+                    <FormControl>
+                      <Input placeholder="+7 701 123 4567" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Admin IIN */}
+              <FormField
+                control={form.control}
+                name="admin_iin"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Admin IIN</FormLabel>
+                    <FormControl>
+                      <Input placeholder="123456789012" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
