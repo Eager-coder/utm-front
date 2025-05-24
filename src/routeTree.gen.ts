@@ -12,6 +12,7 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
+import { Route as SoloPilotIndexImport } from './routes/solo-pilot/index'
 import { Route as PilotRegistrationIndexImport } from './routes/pilot-registration/index'
 import { Route as OrgRegistrationIndexImport } from './routes/org-registration/index'
 import { Route as OrgPilotIndexImport } from './routes/org-pilot/index'
@@ -31,6 +32,12 @@ import { Route as LoginOrganizationImport } from './routes/login/organization'
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const SoloPilotIndexRoute = SoloPilotIndexImport.update({
+  id: '/solo-pilot/',
+  path: '/solo-pilot/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -216,6 +223,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PilotRegistrationIndexImport
       parentRoute: typeof rootRoute
     }
+    '/solo-pilot/': {
+      id: '/solo-pilot/'
+      path: '/solo-pilot'
+      fullPath: '/solo-pilot'
+      preLoaderRoute: typeof SoloPilotIndexImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -236,6 +250,7 @@ export interface FileRoutesByFullPath {
   '/org-pilot': typeof OrgPilotIndexRoute
   '/org-registration': typeof OrgRegistrationIndexRoute
   '/pilot-registration': typeof PilotRegistrationIndexRoute
+  '/solo-pilot': typeof SoloPilotIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -253,6 +268,7 @@ export interface FileRoutesByTo {
   '/org-pilot': typeof OrgPilotIndexRoute
   '/org-registration': typeof OrgRegistrationIndexRoute
   '/pilot-registration': typeof PilotRegistrationIndexRoute
+  '/solo-pilot': typeof SoloPilotIndexRoute
 }
 
 export interface FileRoutesById {
@@ -271,6 +287,7 @@ export interface FileRoutesById {
   '/org-pilot/': typeof OrgPilotIndexRoute
   '/org-registration/': typeof OrgRegistrationIndexRoute
   '/pilot-registration/': typeof PilotRegistrationIndexRoute
+  '/solo-pilot/': typeof SoloPilotIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -290,6 +307,7 @@ export interface FileRouteTypes {
     | '/org-pilot'
     | '/org-registration'
     | '/pilot-registration'
+    | '/solo-pilot'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -306,6 +324,7 @@ export interface FileRouteTypes {
     | '/org-pilot'
     | '/org-registration'
     | '/pilot-registration'
+    | '/solo-pilot'
   id:
     | '__root__'
     | '/'
@@ -322,6 +341,7 @@ export interface FileRouteTypes {
     | '/org-pilot/'
     | '/org-registration/'
     | '/pilot-registration/'
+    | '/solo-pilot/'
   fileRoutesById: FileRoutesById
 }
 
@@ -340,6 +360,7 @@ export interface RootRouteChildren {
   OrgPilotIndexRoute: typeof OrgPilotIndexRoute
   OrgRegistrationIndexRoute: typeof OrgRegistrationIndexRoute
   PilotRegistrationIndexRoute: typeof PilotRegistrationIndexRoute
+  SoloPilotIndexRoute: typeof SoloPilotIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -357,6 +378,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrgPilotIndexRoute: OrgPilotIndexRoute,
   OrgRegistrationIndexRoute: OrgRegistrationIndexRoute,
   PilotRegistrationIndexRoute: PilotRegistrationIndexRoute,
+  SoloPilotIndexRoute: SoloPilotIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -382,7 +404,8 @@ export const routeTree = rootRoute
         "/org-dashboard/",
         "/org-pilot/",
         "/org-registration/",
-        "/pilot-registration/"
+        "/pilot-registration/",
+        "/solo-pilot/"
       ]
     },
     "/": {
@@ -426,6 +449,9 @@ export const routeTree = rootRoute
     },
     "/pilot-registration/": {
       "filePath": "pilot-registration/index.tsx"
+    },
+    "/solo-pilot/": {
+      "filePath": "solo-pilot/index.tsx"
     }
   }
 }
