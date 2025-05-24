@@ -20,6 +20,7 @@ import { Route as PilotRegistrationSuccessImport } from './routes/pilot-registra
 import { Route as OrgRegistrationSuccessImport } from './routes/org-registration/success'
 import { Route as OrgDashboardPilotsImport } from './routes/org-dashboard/pilots'
 import { Route as OrgDashboardFlightsImport } from './routes/org-dashboard/flights'
+import { Route as OrgDashboardFlightRequestsImport } from './routes/org-dashboard/flight-requests'
 import { Route as LoginPilotImport } from './routes/login/pilot'
 import { Route as LoginOrganizationImport } from './routes/login/organization'
 
@@ -79,6 +80,14 @@ const OrgDashboardFlightsRoute = OrgDashboardFlightsImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const OrgDashboardFlightRequestsRoute = OrgDashboardFlightRequestsImport.update(
+  {
+    id: '/org-dashboard/flight-requests',
+    path: '/org-dashboard/flight-requests',
+    getParentRoute: () => rootRoute,
+  } as any,
+)
+
 const LoginPilotRoute = LoginPilotImport.update({
   id: '/login/pilot',
   path: '/login/pilot',
@@ -114,6 +123,13 @@ declare module '@tanstack/react-router' {
       path: '/login/pilot'
       fullPath: '/login/pilot'
       preLoaderRoute: typeof LoginPilotImport
+      parentRoute: typeof rootRoute
+    }
+    '/org-dashboard/flight-requests': {
+      id: '/org-dashboard/flight-requests'
+      path: '/org-dashboard/flight-requests'
+      fullPath: '/org-dashboard/flight-requests'
+      preLoaderRoute: typeof OrgDashboardFlightRequestsImport
       parentRoute: typeof rootRoute
     }
     '/org-dashboard/flights': {
@@ -181,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login/organization': typeof LoginOrganizationRoute
   '/login/pilot': typeof LoginPilotRoute
+  '/org-dashboard/flight-requests': typeof OrgDashboardFlightRequestsRoute
   '/org-dashboard/flights': typeof OrgDashboardFlightsRoute
   '/org-dashboard/pilots': typeof OrgDashboardPilotsRoute
   '/org-registration/success': typeof OrgRegistrationSuccessRoute
@@ -195,6 +212,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login/organization': typeof LoginOrganizationRoute
   '/login/pilot': typeof LoginPilotRoute
+  '/org-dashboard/flight-requests': typeof OrgDashboardFlightRequestsRoute
   '/org-dashboard/flights': typeof OrgDashboardFlightsRoute
   '/org-dashboard/pilots': typeof OrgDashboardPilotsRoute
   '/org-registration/success': typeof OrgRegistrationSuccessRoute
@@ -210,6 +228,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/login/organization': typeof LoginOrganizationRoute
   '/login/pilot': typeof LoginPilotRoute
+  '/org-dashboard/flight-requests': typeof OrgDashboardFlightRequestsRoute
   '/org-dashboard/flights': typeof OrgDashboardFlightsRoute
   '/org-dashboard/pilots': typeof OrgDashboardPilotsRoute
   '/org-registration/success': typeof OrgRegistrationSuccessRoute
@@ -226,6 +245,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login/organization'
     | '/login/pilot'
+    | '/org-dashboard/flight-requests'
     | '/org-dashboard/flights'
     | '/org-dashboard/pilots'
     | '/org-registration/success'
@@ -239,6 +259,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login/organization'
     | '/login/pilot'
+    | '/org-dashboard/flight-requests'
     | '/org-dashboard/flights'
     | '/org-dashboard/pilots'
     | '/org-registration/success'
@@ -252,6 +273,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login/organization'
     | '/login/pilot'
+    | '/org-dashboard/flight-requests'
     | '/org-dashboard/flights'
     | '/org-dashboard/pilots'
     | '/org-registration/success'
@@ -267,6 +289,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginOrganizationRoute: typeof LoginOrganizationRoute
   LoginPilotRoute: typeof LoginPilotRoute
+  OrgDashboardFlightRequestsRoute: typeof OrgDashboardFlightRequestsRoute
   OrgDashboardFlightsRoute: typeof OrgDashboardFlightsRoute
   OrgDashboardPilotsRoute: typeof OrgDashboardPilotsRoute
   OrgRegistrationSuccessRoute: typeof OrgRegistrationSuccessRoute
@@ -281,6 +304,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginOrganizationRoute: LoginOrganizationRoute,
   LoginPilotRoute: LoginPilotRoute,
+  OrgDashboardFlightRequestsRoute: OrgDashboardFlightRequestsRoute,
   OrgDashboardFlightsRoute: OrgDashboardFlightsRoute,
   OrgDashboardPilotsRoute: OrgDashboardPilotsRoute,
   OrgRegistrationSuccessRoute: OrgRegistrationSuccessRoute,
@@ -304,6 +328,7 @@ export const routeTree = rootRoute
         "/",
         "/login/organization",
         "/login/pilot",
+        "/org-dashboard/flight-requests",
         "/org-dashboard/flights",
         "/org-dashboard/pilots",
         "/org-registration/success",
@@ -322,6 +347,9 @@ export const routeTree = rootRoute
     },
     "/login/pilot": {
       "filePath": "login/pilot.tsx"
+    },
+    "/org-dashboard/flight-requests": {
+      "filePath": "org-dashboard/flight-requests.tsx"
     },
     "/org-dashboard/flights": {
       "filePath": "org-dashboard/flights.tsx"
