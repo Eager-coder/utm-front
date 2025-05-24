@@ -12,12 +12,26 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
+import { Route as PilotRegistrationIndexImport } from './routes/pilot-registration/index'
+import { Route as PilotRegistrationSuccessImport } from './routes/pilot-registration/success'
 
 // Create/Update Routes
 
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const PilotRegistrationIndexRoute = PilotRegistrationIndexImport.update({
+  id: '/pilot-registration/',
+  path: '/pilot-registration/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const PilotRegistrationSuccessRoute = PilotRegistrationSuccessImport.update({
+  id: '/pilot-registration/success',
+  path: '/pilot-registration/success',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -32,6 +46,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/pilot-registration/success': {
+      id: '/pilot-registration/success'
+      path: '/pilot-registration/success'
+      fullPath: '/pilot-registration/success'
+      preLoaderRoute: typeof PilotRegistrationSuccessImport
+      parentRoute: typeof rootRoute
+    }
+    '/pilot-registration/': {
+      id: '/pilot-registration/'
+      path: '/pilot-registration'
+      fullPath: '/pilot-registration'
+      preLoaderRoute: typeof PilotRegistrationIndexImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -39,32 +67,42 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/pilot-registration/success': typeof PilotRegistrationSuccessRoute
+  '/pilot-registration': typeof PilotRegistrationIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/pilot-registration/success': typeof PilotRegistrationSuccessRoute
+  '/pilot-registration': typeof PilotRegistrationIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/pilot-registration/success': typeof PilotRegistrationSuccessRoute
+  '/pilot-registration/': typeof PilotRegistrationIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/pilot-registration/success' | '/pilot-registration'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/pilot-registration/success' | '/pilot-registration'
+  id: '__root__' | '/' | '/pilot-registration/success' | '/pilot-registration/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PilotRegistrationSuccessRoute: typeof PilotRegistrationSuccessRoute
+  PilotRegistrationIndexRoute: typeof PilotRegistrationIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PilotRegistrationSuccessRoute: PilotRegistrationSuccessRoute,
+  PilotRegistrationIndexRoute: PilotRegistrationIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -77,11 +115,19 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/"
+        "/",
+        "/pilot-registration/success",
+        "/pilot-registration/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/pilot-registration/success": {
+      "filePath": "pilot-registration/success.tsx"
+    },
+    "/pilot-registration/": {
+      "filePath": "pilot-registration/index.tsx"
     }
   }
 }
