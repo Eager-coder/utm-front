@@ -43,6 +43,34 @@ function OrgDashboardHome() {
             </Button>
           </CardContent>
         </Card>
+        {/* Flight Requests */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Flight Requests</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              View and approve or reject flight submissions.
+            </p>
+            <Button asChild>
+              <Link to="/org-dashboard/flight-requests">Open requests</Link>
+            </Button>
+          </CardContent>
+        </Card>
+        {/* Live Map */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Live Drone Map</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              Monitor all drone positions and connection status in real time.
+            </p>
+            <Button asChild>
+              <Link to="/org-dashboard/live-map">View Map</Link>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
