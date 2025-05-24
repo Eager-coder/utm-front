@@ -37,7 +37,7 @@ function SuccessPage() {
             <Link to="/">Go home</Link>
           </Button>
           <Button asChild>
-            <Link to="/dashboard">Open dashboard</Link>
+            <Link to="/">Open dashboard</Link>
           </Button>
         </CardFooter>
       </Card>
