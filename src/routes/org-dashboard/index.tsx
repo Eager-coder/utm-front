@@ -57,6 +57,20 @@ function OrgDashboardHome() {
             </Button>
           </CardContent>
         </Card>
+        {/* Live Map */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Live Drone Map</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              Monitor all drone positions and connection status in real time.
+            </p>
+            <Button asChild>
+              <Link to="/org-dashboard/live-map">View Map</Link>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
