@@ -1,5 +1,4 @@
 // src/routes/organization-registration.page.tsx
-import * as React from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
@@ -76,7 +75,7 @@ function OrganizationRegistrationPage() {
     mutationFn: registerOrganization,
     onSuccess: () => {
       toast.success('Organization registered!')
-      navigate({ to: '/organization-registration/success' })
+      navigate({ to: '/org-registration/success' })
     },
     onError: (e) => {
       toast.error(e instanceof Error ? e.message : 'Registration failed')
