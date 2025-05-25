@@ -9,7 +9,6 @@ import {
   Marker,
   InfoWindow,
 } from '@react-google-maps/api'
-import { getAllFlights } from '@/api/flight-requests/getAllFlights' // Create this API
 import type { FlightRequestDto } from '@/api/flight-requests/createFlightRequest'
 import { getAllFlightRequests } from '@/api/flight-requests/getAllFlightRequests'
 import { RegAuthorityNavbar } from '@/components/RegAuthorityNavbar'

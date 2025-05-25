@@ -61,7 +61,7 @@ const DRONE_STATUSES: DroneStatus[] = [
 ]
 
 function PilotsPage() {
-  const { data: pilots = [], isPending } = useQuery({
+  const { data: pilots = [] } = useQuery({
     queryKey: ['org-pilots'],
     queryFn: async (): Promise<PilotWithDrone[]> => mockPilots,
   })

@@ -1,5 +1,5 @@
 // src/routes/solo-pilot/index.tsx (or appropriate file for /solo-pilot/ route)
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 
@@ -249,7 +249,7 @@ function SoloPilotDashboard() {
       await new Promise((resolve) => setTimeout(resolve, 500)) // Simulate API delay
       return { id } // Return something to satisfy onSuccess
     },
-    onSuccess: (data, flightId) => {
+    onSuccess: (_data, flightId) => {
       queryClient.invalidateQueries({ queryKey: ['myFlights'] }) // To update flight status in list
       startFrontendSimulation(flightId)
       // Also update the local 'flights' state for status, or rely on query invalidation
