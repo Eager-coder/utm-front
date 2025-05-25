@@ -9,8 +9,9 @@ import {
   Marker,
   InfoWindow,
 } from '@react-google-maps/api'
-import { getAllFlights } from '@/api/flight-requests/getAllFlights' // Create this API if needed
+import { getAllFlights } from '@/api/flight-requests/getAllFlights' // Create this API
 import type { FlightRequestDto } from '@/api/flight-requests/createFlightRequest'
+import { getAllFlightRequests } from '@/api/flight-requests/getAllFlightRequests'
 
 export const Route = createFileRoute('/reg-authority/flights-history')({
   component: FlightsHistory,
@@ -19,7 +20,7 @@ export const Route = createFileRoute('/reg-authority/flights-history')({
 function FlightsHistory() {
   const { data: flights = [], isLoading } = useQuery<FlightRequestDto[]>({
     queryKey: ['allFlights'],
-    queryFn: () => getAllFlights(),
+    queryFn: () => getAllFlightRequests(),
   })
 
   const [hoveredId, setHoveredId] = useState<number | null>(null)
@@ -111,6 +112,7 @@ function FlightsHistory() {
                   position={{ lat: wp.latitude, lng: wp.longitude }}
                   icon={{
                     url: createSvgIcon(flightColors[flight.id], 4),
+                    // @ts-expect-error
                     anchor: { x: 4, y: 4 },
                   }}
                   onMouseOver={() => setHoveredId(flight.id)}

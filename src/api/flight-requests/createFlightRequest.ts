@@ -56,6 +56,14 @@ export interface DroneDto {
   updated_at: string
 }
 
+export interface Waypoint {
+  latitude: number
+  longitude: number
+  altitude_m: number
+  sequence_order: number
+  // id: number
+  // flight_plan_id: number
+}
 export interface WaypointDto {
   latitude: number
   longitude: number
