@@ -1,5 +1,5 @@
 // src/routes/org-dashboard/flight-requests.tsx
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getMyFlighRequests } from '@/api/flight-requests/getMyFlightRequests'
@@ -11,7 +11,7 @@ import {
   Marker,
   InfoWindow,
 } from '@react-google-maps/api'
-import { Button } from '@/components/ui/button'
+// import { Button } from '@/components/ui/button'
 import type { FlightRequestDto } from '@/api/flight-requests/createFlightRequest'
 
 export const Route = createFileRoute('/solo-pilot/')({
@@ -19,7 +19,7 @@ export const Route = createFileRoute('/solo-pilot/')({
 })
 
 function FlightRequests() {
-  const navigate = useNavigate()
+  //   const navigate = useNavigate()
   const { data: flights = [], isLoading: loadingFlights } = useQuery<
     FlightRequestDto[]
   >({

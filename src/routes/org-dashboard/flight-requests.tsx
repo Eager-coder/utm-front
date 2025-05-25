@@ -1,6 +1,6 @@
 // src/routes/org-dashboard/flight-requests.tsx
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useState, useEffect } from 'react'
+import { createFileRoute } from '@tanstack/react-router'
+import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { getMyDrones } from '@/api/drone-management/getMyDrones'
@@ -8,7 +8,7 @@ import type { Drone } from '@/api/drone-management/createDrone'
 import {
   createFlightRequest,
   type CreateFlightRequest as CreateFlightRequestPayload,
-  type Waypoint,
+  type CrateaWaypoint,
 } from '@/api/flight-requests/createFlightRequest'
 import {
   Select,
@@ -42,7 +42,6 @@ function NewFlightRequest() {
     queryFn: getMyDrones,
   })
 
-  const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   const mutation = useMutation<any, Error, CreateFlightRequestPayload>({
@@ -111,12 +110,14 @@ function NewFlightRequest() {
       return
     }
 
-    const waypointsPayload: Waypoint[] = form.waypoints.map((wp, index) => ({
-      latitude: wp.lat,
-      longitude: wp.lng,
-      altitude_m: parseFloat(form.altitude_m), // Use the single altitude for all waypoints
-      sequence_order: index + 1,
-    }))
+    const waypointsPayload: CrateaWaypoint[] = form.waypoints.map(
+      (wp, index) => ({
+        latitude: wp.lat,
+        longitude: wp.lng,
+        altitude_m: parseFloat(form.altitude_m), // Use the single altitude for all waypoints
+        sequence_order: index + 1,
+      }),
+    )
 
     const payload: CreateFlightRequestPayload = {
       drone_id: parseInt(form.drone_id, 10),
