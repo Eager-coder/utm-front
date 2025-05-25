@@ -121,8 +121,14 @@ function NewFlightRequestPage() {
   return (
     <div className="p-6 space-y-4">
       <nav className="flex justify-between">
-        <h1 className="text-3xl font-bold">Solo pilot dashboard</h1>
+        <h1 className="text-3xl font-bold">Solo pilot</h1>
         <div className="flex gap-4">
+          <Link
+            to="/solo-pilot"
+            className="rounded-md py-1 px-3 border border-zinc-300"
+          >
+            Dashboard
+          </Link>
           <Link
             to="/solo-pilot/drone-management"
             className="rounded-md py-1 px-3 border border-zinc-300"
