@@ -19,6 +19,7 @@ import { Route as OrgRegistrationIndexImport } from './routes/org-registration/i
 import { Route as OrgPilotIndexImport } from './routes/org-pilot/index'
 import { Route as OrgDashboardIndexImport } from './routes/org-dashboard/index'
 import { Route as LoginIndexImport } from './routes/login/index'
+import { Route as SoloPilotNewFlightRequestImport } from './routes/solo-pilot/new-flight-request'
 import { Route as SoloPilotDroneManagementImport } from './routes/solo-pilot/drone-management'
 import { Route as RegAuthorityOrganizationsImport } from './routes/reg-authority/organizations'
 import { Route as PilotRegistrationSuccessImport } from './routes/pilot-registration/success'
@@ -75,6 +76,12 @@ const OrgDashboardIndexRoute = OrgDashboardIndexImport.update({
 const LoginIndexRoute = LoginIndexImport.update({
   id: '/login/',
   path: '/login/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const SoloPilotNewFlightRequestRoute = SoloPilotNewFlightRequestImport.update({
+  id: '/solo-pilot/new-flight-request',
+  path: '/solo-pilot/new-flight-request',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -195,6 +202,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SoloPilotDroneManagementImport
       parentRoute: typeof rootRoute
     }
+    '/solo-pilot/new-flight-request': {
+      id: '/solo-pilot/new-flight-request'
+      path: '/solo-pilot/new-flight-request'
+      fullPath: '/solo-pilot/new-flight-request'
+      preLoaderRoute: typeof SoloPilotNewFlightRequestImport
+      parentRoute: typeof rootRoute
+    }
     '/login/': {
       id: '/login/'
       path: '/login'
@@ -259,6 +273,7 @@ export interface FileRoutesByFullPath {
   '/pilot-registration/success': typeof PilotRegistrationSuccessRoute
   '/reg-authority/organizations': typeof RegAuthorityOrganizationsRoute
   '/solo-pilot/drone-management': typeof SoloPilotDroneManagementRoute
+  '/solo-pilot/new-flight-request': typeof SoloPilotNewFlightRequestRoute
   '/login': typeof LoginIndexRoute
   '/org-dashboard': typeof OrgDashboardIndexRoute
   '/org-pilot': typeof OrgPilotIndexRoute
@@ -278,6 +293,7 @@ export interface FileRoutesByTo {
   '/pilot-registration/success': typeof PilotRegistrationSuccessRoute
   '/reg-authority/organizations': typeof RegAuthorityOrganizationsRoute
   '/solo-pilot/drone-management': typeof SoloPilotDroneManagementRoute
+  '/solo-pilot/new-flight-request': typeof SoloPilotNewFlightRequestRoute
   '/login': typeof LoginIndexRoute
   '/org-dashboard': typeof OrgDashboardIndexRoute
   '/org-pilot': typeof OrgPilotIndexRoute
@@ -298,6 +314,7 @@ export interface FileRoutesById {
   '/pilot-registration/success': typeof PilotRegistrationSuccessRoute
   '/reg-authority/organizations': typeof RegAuthorityOrganizationsRoute
   '/solo-pilot/drone-management': typeof SoloPilotDroneManagementRoute
+  '/solo-pilot/new-flight-request': typeof SoloPilotNewFlightRequestRoute
   '/login/': typeof LoginIndexRoute
   '/org-dashboard/': typeof OrgDashboardIndexRoute
   '/org-pilot/': typeof OrgPilotIndexRoute
@@ -319,6 +336,7 @@ export interface FileRouteTypes {
     | '/pilot-registration/success'
     | '/reg-authority/organizations'
     | '/solo-pilot/drone-management'
+    | '/solo-pilot/new-flight-request'
     | '/login'
     | '/org-dashboard'
     | '/org-pilot'
@@ -337,6 +355,7 @@ export interface FileRouteTypes {
     | '/pilot-registration/success'
     | '/reg-authority/organizations'
     | '/solo-pilot/drone-management'
+    | '/solo-pilot/new-flight-request'
     | '/login'
     | '/org-dashboard'
     | '/org-pilot'
@@ -355,6 +374,7 @@ export interface FileRouteTypes {
     | '/pilot-registration/success'
     | '/reg-authority/organizations'
     | '/solo-pilot/drone-management'
+    | '/solo-pilot/new-flight-request'
     | '/login/'
     | '/org-dashboard/'
     | '/org-pilot/'
@@ -375,6 +395,7 @@ export interface RootRouteChildren {
   PilotRegistrationSuccessRoute: typeof PilotRegistrationSuccessRoute
   RegAuthorityOrganizationsRoute: typeof RegAuthorityOrganizationsRoute
   SoloPilotDroneManagementRoute: typeof SoloPilotDroneManagementRoute
+  SoloPilotNewFlightRequestRoute: typeof SoloPilotNewFlightRequestRoute
   LoginIndexRoute: typeof LoginIndexRoute
   OrgDashboardIndexRoute: typeof OrgDashboardIndexRoute
   OrgPilotIndexRoute: typeof OrgPilotIndexRoute
@@ -394,6 +415,7 @@ const rootRouteChildren: RootRouteChildren = {
   PilotRegistrationSuccessRoute: PilotRegistrationSuccessRoute,
   RegAuthorityOrganizationsRoute: RegAuthorityOrganizationsRoute,
   SoloPilotDroneManagementRoute: SoloPilotDroneManagementRoute,
+  SoloPilotNewFlightRequestRoute: SoloPilotNewFlightRequestRoute,
   LoginIndexRoute: LoginIndexRoute,
   OrgDashboardIndexRoute: OrgDashboardIndexRoute,
   OrgPilotIndexRoute: OrgPilotIndexRoute,
@@ -422,6 +444,7 @@ export const routeTree = rootRoute
         "/pilot-registration/success",
         "/reg-authority/organizations",
         "/solo-pilot/drone-management",
+        "/solo-pilot/new-flight-request",
         "/login/",
         "/org-dashboard/",
         "/org-pilot/",
@@ -457,6 +480,9 @@ export const routeTree = rootRoute
     },
     "/solo-pilot/drone-management": {
       "filePath": "solo-pilot/drone-management.tsx"
+    },
+    "/solo-pilot/new-flight-request": {
+      "filePath": "solo-pilot/new-flight-request.tsx"
     },
     "/login/": {
       "filePath": "login/index.tsx"
