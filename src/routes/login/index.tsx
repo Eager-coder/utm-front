@@ -40,7 +40,7 @@ function RouteComponent() {
 
   return (
     <div className="max-w-md mx-auto mt-20 p-8 bg-white rounded-lg shadow">
-      <h2 className="text-2xl font-semibold mb-6">Pilot Login</h2>
+      <h2 className="text-2xl font-semibold mb-6">Sign in to UTM</h2>
       <form onSubmit={onSubmit} className="space-y-4">
         <Input
           type="email"
@@ -55,7 +55,7 @@ function RouteComponent() {
           onChange={(e) => setPassword(e.target.value)}
         />
         <Button type="submit" className="w-full" disabled={mutation.isPending}>
-          {mutation.isPending ? 'Logging in...' : 'Login as Pilot'}
+          {mutation.isPending ? 'Logging in...' : 'Login'}
         </Button>
       </form>
     </div>

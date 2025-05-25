@@ -29,7 +29,7 @@ function App() {
         navigate({ to: '/org-dashboard' })
         break
       case 'AUTHORITY_ADMIN':
-        navigate({ to: '/reg-authority/organizations' })
+        navigate({ to: '/reg-authority' })
         break
       default:
         navigate({ to: '/login' })
