@@ -25,6 +25,7 @@ import {
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
+import { SoloPilotNavbar } from '@/components/SoloPilotNavbar'
 
 export const Route = createFileRoute('/solo-pilot/drone-management')({
   component: RouteComponent,
@@ -102,29 +103,7 @@ function RouteComponent() {
 
   return (
     <div className="max-w-5xl mx-auto">
-      <nav className="flex justify-between">
-        <h1 className="text-3xl font-bold">Solo pilot</h1>
-        <div className="flex gap-4">
-          <Link
-            to="/solo-pilot"
-            className="rounded-md py-1 px-3 border border-zinc-300"
-          >
-            Dashboard
-          </Link>
-          <Link
-            to="/solo-pilot"
-            className="rounded-md py-1 px-3 border border-zinc-300"
-          >
-            Drone management
-          </Link>
-          <Link
-            className="rounded-md py-1 px-3 border bg-zinc-900 font-medium text-white  border-zinc-300"
-            to="/solo-pilot/new-flight-request"
-          >
-            New flight request
-          </Link>
-        </div>
-      </nav>
+      <SoloPilotNavbar />
 
       <div className="mt-8 flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Your Drones</h2>
