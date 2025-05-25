@@ -16,6 +16,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { LoadScript, GoogleMap, Marker, Polyline } from '@react-google-maps/api'
 import { ArrowLeft } from 'lucide-react'
+import { SoloPilotNavbar } from '@/components/SoloPilotNavbar'
 
 export const Route = createFileRoute('/solo-pilot/new-flight-request')({
   component: NewFlightRequestPage,
@@ -120,23 +121,8 @@ function NewFlightRequestPage() {
 
   return (
     <div className="p-6 space-y-4">
-      <nav className="flex justify-between">
-        <h1 className="text-3xl font-bold">Solo pilot dashboard</h1>
-        <div className="flex gap-4">
-          <Link
-            to="/solo-pilot/drone-management"
-            className="rounded-md py-1 px-3 border border-zinc-300"
-          >
-            Drone management
-          </Link>
-          <Link
-            className="rounded-md py-1 px-3 border bg-zinc-900 font-medium text-white  border-zinc-300"
-            to="/solo-pilot/new-flight-request"
-          >
-            New flight request
-          </Link>
-        </div>
-      </nav>
+      <SoloPilotNavbar />
+
       <Button variant="outline" onClick={() => navigate({ to: '/solo-pilot' })}>
         <ArrowLeft />
         Back
