@@ -8,6 +8,17 @@ export interface CreateFlightRequest {
   waypoints: CrateaWaypoint[]
 }
 
+export type FlightRequestStatus =
+  | 'PENDING_ORG_APPROVAL'
+  | 'PENDING_AUTHORITY_APPROVAL'
+  | 'APPROVED'
+  | 'REJECTED_BY_ORG'
+  | 'REJECTED_BY_AUTHORITY'
+  | 'ACTIVE'
+  | 'COMPLETED'
+  | 'CANCELLED_BY_PILOT'
+  | 'CANCELLED_BY_ADMIN'
+
 export interface FlightRequestDto {
   drone_id: number
   planned_departure_time: string // ISO date-time
@@ -16,16 +27,7 @@ export interface FlightRequestDto {
   id: number
   user_id: number
   organization_id?: number | null
-  status:
-    | 'PENDING_ORG_APPROVAL'
-    | 'PENDING_AUTHORITY_APPROVAL'
-    | 'APPROVED'
-    | 'REJECTED_BY_ORG'
-    | 'REJECTED_BY_AUTHORITY'
-    | 'ACTIVE'
-    | 'COMPLETED'
-    | 'CANCELLED_BY_PILOT'
-    | 'CANCELLED_BY_ADMIN'
+  status: FlightRequestStatus
   actual_departure_time?: string | null
   actual_arrival_time?: string | null
   rejection_reason?: string | null

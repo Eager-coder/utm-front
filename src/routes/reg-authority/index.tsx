@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/table'
 import { getOrganizations } from '@/api/organizations/getOrganizations'
 import { getSoloPilots } from '@/api/organizations/getUsers'
+import { RegAuthorityNavbar } from '@/components/RegAuthorityNavbar'
 
 export const Route = createFileRoute('/reg-authority/')({
   component: RegulatoryDashboard,
@@ -36,6 +37,7 @@ function RegulatoryDashboard() {
 
   return (
     <div className="p-6 space-y-6">
+      <RegAuthorityNavbar />
       <h1 className="text-2xl font-semibold">Regulatory Authority Dashboard</h1>
 
       <div className="flex gap-4">
