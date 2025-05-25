@@ -58,6 +58,7 @@ function RegulatoryDashboard() {
             <TableRow>
               <TableHead>Name</TableHead>
               {view === 'org' && <TableHead>City</TableHead>}
+              {view === 'org' && <TableHead>Adress</TableHead>}
               {view === 'org' && <TableHead>BIN</TableHead>}
               {view === 'solo' && <TableHead>Email</TableHead>}
               {view === 'solo' && <TableHead>Phone</TableHead>}
@@ -73,6 +74,7 @@ function RegulatoryDashboard() {
                 <TableRow key={org.id}>
                   <TableCell>{org.name}</TableCell>
                   <TableCell>{org.city}</TableCell>
+                  <TableCell>{org.company_address}</TableCell>
                   <TableCell>{org.bin}</TableCell>
                   <TableCell>
                     {new Date(org.created_at).toLocaleDateString()}

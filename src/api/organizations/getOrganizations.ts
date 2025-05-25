@@ -9,6 +9,8 @@ import apiClient from '../apiClient'
 export interface Organization {
   id: number
   name: string
+  email: string
+  phone_number: string
   bin: string
   city: string
   company_address: string
