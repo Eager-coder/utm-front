@@ -22,6 +22,7 @@ import { Route as LoginIndexImport } from './routes/login/index'
 import { Route as SoloPilotNewFlightRequestImport } from './routes/solo-pilot/new-flight-request'
 import { Route as SoloPilotDroneManagementImport } from './routes/solo-pilot/drone-management'
 import { Route as RegAuthorityOrganizationsImport } from './routes/reg-authority/organizations'
+import { Route as RegAuthorityFlightsHistoryImport } from './routes/reg-authority/flights-history'
 import { Route as PilotRegistrationSuccessImport } from './routes/pilot-registration/success'
 import { Route as OrgRegistrationSuccessImport } from './routes/org-registration/success'
 import { Route as OrgDashboardPilotsImport } from './routes/org-dashboard/pilots'
@@ -96,6 +97,14 @@ const RegAuthorityOrganizationsRoute = RegAuthorityOrganizationsImport.update({
   path: '/reg-authority/organizations',
   getParentRoute: () => rootRoute,
 } as any)
+
+const RegAuthorityFlightsHistoryRoute = RegAuthorityFlightsHistoryImport.update(
+  {
+    id: '/reg-authority/flights-history',
+    path: '/reg-authority/flights-history',
+    getParentRoute: () => rootRoute,
+  } as any,
+)
 
 const PilotRegistrationSuccessRoute = PilotRegistrationSuccessImport.update({
   id: '/pilot-registration/success',
@@ -188,6 +197,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PilotRegistrationSuccessImport
       parentRoute: typeof rootRoute
     }
+    '/reg-authority/flights-history': {
+      id: '/reg-authority/flights-history'
+      path: '/reg-authority/flights-history'
+      fullPath: '/reg-authority/flights-history'
+      preLoaderRoute: typeof RegAuthorityFlightsHistoryImport
+      parentRoute: typeof rootRoute
+    }
     '/reg-authority/organizations': {
       id: '/reg-authority/organizations'
       path: '/reg-authority/organizations'
@@ -271,6 +287,7 @@ export interface FileRoutesByFullPath {
   '/org-dashboard/pilots': typeof OrgDashboardPilotsRoute
   '/org-registration/success': typeof OrgRegistrationSuccessRoute
   '/pilot-registration/success': typeof PilotRegistrationSuccessRoute
+  '/reg-authority/flights-history': typeof RegAuthorityFlightsHistoryRoute
   '/reg-authority/organizations': typeof RegAuthorityOrganizationsRoute
   '/solo-pilot/drone-management': typeof SoloPilotDroneManagementRoute
   '/solo-pilot/new-flight-request': typeof SoloPilotNewFlightRequestRoute
@@ -291,6 +308,7 @@ export interface FileRoutesByTo {
   '/org-dashboard/pilots': typeof OrgDashboardPilotsRoute
   '/org-registration/success': typeof OrgRegistrationSuccessRoute
   '/pilot-registration/success': typeof PilotRegistrationSuccessRoute
+  '/reg-authority/flights-history': typeof RegAuthorityFlightsHistoryRoute
   '/reg-authority/organizations': typeof RegAuthorityOrganizationsRoute
   '/solo-pilot/drone-management': typeof SoloPilotDroneManagementRoute
   '/solo-pilot/new-flight-request': typeof SoloPilotNewFlightRequestRoute
@@ -312,6 +330,7 @@ export interface FileRoutesById {
   '/org-dashboard/pilots': typeof OrgDashboardPilotsRoute
   '/org-registration/success': typeof OrgRegistrationSuccessRoute
   '/pilot-registration/success': typeof PilotRegistrationSuccessRoute
+  '/reg-authority/flights-history': typeof RegAuthorityFlightsHistoryRoute
   '/reg-authority/organizations': typeof RegAuthorityOrganizationsRoute
   '/solo-pilot/drone-management': typeof SoloPilotDroneManagementRoute
   '/solo-pilot/new-flight-request': typeof SoloPilotNewFlightRequestRoute
@@ -334,6 +353,7 @@ export interface FileRouteTypes {
     | '/org-dashboard/pilots'
     | '/org-registration/success'
     | '/pilot-registration/success'
+    | '/reg-authority/flights-history'
     | '/reg-authority/organizations'
     | '/solo-pilot/drone-management'
     | '/solo-pilot/new-flight-request'
@@ -353,6 +373,7 @@ export interface FileRouteTypes {
     | '/org-dashboard/pilots'
     | '/org-registration/success'
     | '/pilot-registration/success'
+    | '/reg-authority/flights-history'
     | '/reg-authority/organizations'
     | '/solo-pilot/drone-management'
     | '/solo-pilot/new-flight-request'
@@ -372,6 +393,7 @@ export interface FileRouteTypes {
     | '/org-dashboard/pilots'
     | '/org-registration/success'
     | '/pilot-registration/success'
+    | '/reg-authority/flights-history'
     | '/reg-authority/organizations'
     | '/solo-pilot/drone-management'
     | '/solo-pilot/new-flight-request'
@@ -393,6 +415,7 @@ export interface RootRouteChildren {
   OrgDashboardPilotsRoute: typeof OrgDashboardPilotsRoute
   OrgRegistrationSuccessRoute: typeof OrgRegistrationSuccessRoute
   PilotRegistrationSuccessRoute: typeof PilotRegistrationSuccessRoute
+  RegAuthorityFlightsHistoryRoute: typeof RegAuthorityFlightsHistoryRoute
   RegAuthorityOrganizationsRoute: typeof RegAuthorityOrganizationsRoute
   SoloPilotDroneManagementRoute: typeof SoloPilotDroneManagementRoute
   SoloPilotNewFlightRequestRoute: typeof SoloPilotNewFlightRequestRoute
@@ -413,6 +436,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrgDashboardPilotsRoute: OrgDashboardPilotsRoute,
   OrgRegistrationSuccessRoute: OrgRegistrationSuccessRoute,
   PilotRegistrationSuccessRoute: PilotRegistrationSuccessRoute,
+  RegAuthorityFlightsHistoryRoute: RegAuthorityFlightsHistoryRoute,
   RegAuthorityOrganizationsRoute: RegAuthorityOrganizationsRoute,
   SoloPilotDroneManagementRoute: SoloPilotDroneManagementRoute,
   SoloPilotNewFlightRequestRoute: SoloPilotNewFlightRequestRoute,
@@ -442,6 +466,7 @@ export const routeTree = rootRoute
         "/org-dashboard/pilots",
         "/org-registration/success",
         "/pilot-registration/success",
+        "/reg-authority/flights-history",
         "/reg-authority/organizations",
         "/solo-pilot/drone-management",
         "/solo-pilot/new-flight-request",
@@ -474,6 +499,9 @@ export const routeTree = rootRoute
     },
     "/pilot-registration/success": {
       "filePath": "pilot-registration/success.tsx"
+    },
+    "/reg-authority/flights-history": {
+      "filePath": "reg-authority/flights-history.tsx"
     },
     "/reg-authority/organizations": {
       "filePath": "reg-authority/organizations.tsx"

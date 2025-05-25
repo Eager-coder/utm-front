@@ -2,6 +2,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
+import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -101,6 +102,14 @@ function RegulatoryDashboard() {
         {(orgLoading || soloLoading) && (
           <p className="text-muted-foreground mt-4">Loading...</p>
         )}
+      </div>
+      <div className="flex justify-end">
+        <Link
+          to="/reg-authority/flights-history"
+          className="bg-zinc-900 hover:bg-zinc-800 text-white font-semibold py-2 px-4 rounded"
+        >
+          View Flights History
+        </Link>
       </div>
     </div>
   )
