@@ -105,14 +105,6 @@ function RegulatoryDashboard() {
           <p className="text-muted-foreground mt-4">Loading...</p>
         )}
       </div>
-      <div className="flex justify-end">
-        <Link
-          to="/reg-authority/flights-history"
-          className="bg-zinc-900 hover:bg-zinc-800 text-white font-semibold py-2 px-4 rounded"
-        >
-          View Flights History
-        </Link>
-      </div>
     </div>
   )
 }

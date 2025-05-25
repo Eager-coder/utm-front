@@ -12,6 +12,7 @@ import {
 import { getAllFlights } from '@/api/flight-requests/getAllFlights' // Create this API
 import type { FlightRequestDto } from '@/api/flight-requests/createFlightRequest'
 import { getAllFlightRequests } from '@/api/flight-requests/getAllFlightRequests'
+import { RegAuthorityNavbar } from '@/components/RegAuthorityNavbar'
 
 export const Route = createFileRoute('/reg-authority/flights-history')({
   component: FlightsHistory,
@@ -35,119 +36,128 @@ function FlightsHistory() {
   }, [flights])
 
   return (
-    <div className="p-6 flex h-screen space-x-6">
-      {/* Left Table */}
-      <div className="w-1/3 overflow-auto">
-        <h2 className="text-xl font-bold mb-4">History of Flights</h2>
-        <p className="mb-2 text-sm text-muted-foreground">
-          Filter by day | pilot | drone (optional later)
-        </p>
+    <div>
+      <RegAuthorityNavbar />
 
-        {isLoading ? (
-          <p>Loading...</p>
-        ) : (
-          <ul className="space-y-2">
-            {flights.map((flight) => (
-              <li
-                key={flight.id}
-                className="p-2 border rounded hover:bg-gray-100 cursor-pointer"
-                onMouseEnter={() => setHoveredId(flight.id)}
-                onMouseLeave={() => setHoveredId(null)}
-              >
-                <p>
-                  <strong>Drone:</strong> {flight.drone?.brand}{' '}
-                  {flight.drone?.model}
-                </p>
-                <p>
-                  <strong>Pilot:</strong> {flight.user_id}
-                </p>
-                <p>
-                  <strong>Duration:</strong> {flight.planned_departure_time} →{' '}
-                  {flight.planned_arrival_time}
-                </p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      <div className="p-6 flex space-x-6">
+        {/* Left Table */}
+        <div className="w-1/3 overflow-auto">
+          <h2 className="text-xl font-bold mb-4">History of Flights</h2>
+          <p className="mb-2 text-sm text-muted-foreground">
+            Filter by day | pilot | drone (optional later)
+          </p>
 
-      {/* Map Area */}
-      <div className="w-2/3 h-full">
-        <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAP_API_KEY}>
-          <GoogleMap
-            mapContainerStyle={{ width: '100%', height: '100%' }}
-            center={
-              flights[0]?.waypoints?.[0]
-                ? {
-                    lat: flights[0].waypoints[0].latitude,
-                    lng: flights[0].waypoints[0].longitude,
-                  }
-                : { lat: 51.13, lng: 71.43 }
-            }
-            zoom={12}
-          >
-            {flights.map((flight) => {
-              const color = flightColors[flight.id]
-              return (
-                <Polyline
+          {isLoading ? (
+            <p>Loading...</p>
+          ) : (
+            <ul className="space-y-2">
+              {flights.map((flight) => (
+                <li
                   key={flight.id}
-                  path={flight.waypoints.map((wp) => ({
-                    lat: wp.latitude,
-                    lng: wp.longitude,
-                  }))}
-                  options={{
-                    strokeColor: color,
-                    strokeWeight: hoveredId === flight.id ? 6 : 2,
-                  }}
-                  onMouseOver={() => setHoveredId(flight.id)}
-                  onMouseOut={() => setHoveredId(null)}
-                />
-              )
-            })}
+                  className="p-2 border rounded hover:bg-gray-100 cursor-pointer"
+                  onMouseEnter={() => setHoveredId(flight.id)}
+                  onMouseLeave={() => setHoveredId(null)}
+                >
+                  <p>
+                    <strong>Drone:</strong> {flight.drone?.brand}{' '}
+                    {flight.drone?.model}
+                  </p>
+                  <p>
+                    <strong>Pilot:</strong> {flight.user_id}
+                  </p>
+                  <p>
+                    <strong>Duration:</strong> {flight.planned_departure_time} →{' '}
+                    {flight.planned_arrival_time}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
 
-            {flights.map((flight) =>
-              flight.waypoints.map((wp, idx) => (
-                <Marker
-                  key={`marker-${flight.id}-${idx}`}
-                  position={{ lat: wp.latitude, lng: wp.longitude }}
-                  icon={{
-                    url: createSvgIcon(flightColors[flight.id], 4),
-                    // @ts-expect-error
-                    anchor: { x: 4, y: 4 },
-                  }}
-                  onMouseOver={() => setHoveredId(flight.id)}
-                  onMouseOut={() => setHoveredId(null)}
-                />
-              )),
-            )}
+        {/* Map Area */}
+        <div className="w-2/3 h-full">
+          <LoadScript
+            googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAP_API_KEY}
+          >
+            <GoogleMap
+              mapContainerStyle={{ width: '100%', height: '500px' }}
+              center={
+                flights[0]?.waypoints?.[0]
+                  ? {
+                      lat: flights[0].waypoints[0].latitude,
+                      lng: flights[0].waypoints[0].longitude,
+                    }
+                  : { lat: 51.13, lng: 71.43 }
+              }
+              zoom={12}
+            >
+              {flights.map((flight) => {
+                const color = flightColors[flight.id]
+                return (
+                  <Polyline
+                    key={flight.id}
+                    path={flight.waypoints.map((wp) => ({
+                      lat: wp.latitude,
+                      lng: wp.longitude,
+                    }))}
+                    options={{
+                      strokeColor: color,
+                      strokeWeight: hoveredId === flight.id ? 6 : 2,
+                    }}
+                    onMouseOver={() => setHoveredId(flight.id)}
+                    onMouseOut={() => setHoveredId(null)}
+                  />
+                )
+              })}
 
-            {hoveredId != null &&
-              (() => {
-                const flight = flights.find((f) => f.id === hoveredId)!
-                const firstWp = flight.waypoints[0]
-                return firstWp ? (
-                  <InfoWindow
-                    position={{ lat: firstWp.latitude, lng: firstWp.longitude }}
-                    onCloseClick={() => setHoveredId(null)}
-                  >
-                    <div className="text-sm space-y-1">
-                      <p>
-                        <strong>ID:</strong> {flight.id}
-                      </p>
-                      <p>
-                        <strong>Drone:</strong> {flight.drone_id}
-                      </p>
-                      <p>
-                        <strong>Duration:</strong>{' '}
-                        {flight.planned_departure_time} →{' '}
-                        {flight.planned_arrival_time}
-                      </p>
-                    </div>
-                  </InfoWindow>
-                ) : null
-              })()}
-          </GoogleMap>
-        </LoadScript>
+              {flights.map((flight) =>
+                flight.waypoints.map((wp, idx) => (
+                  <Marker
+                    key={`marker-${flight.id}-${idx}`}
+                    position={{ lat: wp.latitude, lng: wp.longitude }}
+                    icon={{
+                      url: createSvgIcon(flightColors[flight.id], 4),
+                      // @ts-expect-error
+                      anchor: { x: 4, y: 4 },
+                    }}
+                    onMouseOver={() => setHoveredId(flight.id)}
+                    onMouseOut={() => setHoveredId(null)}
+                  />
+                )),
+              )}
+
+              {hoveredId != null &&
+                (() => {
+                  const flight = flights.find((f) => f.id === hoveredId)!
+                  const firstWp = flight.waypoints[0]
+                  return firstWp ? (
+                    <InfoWindow
+                      position={{
+                        lat: firstWp.latitude,
+                        lng: firstWp.longitude,
+                      }}
+                      onCloseClick={() => setHoveredId(null)}
+                    >
+                      <div className="text-sm space-y-1">
+                        <p>
+                          <strong>ID:</strong> {flight.id}
+                        </p>
+                        <p>
+                          <strong>Drone:</strong> {flight.drone_id}
+                        </p>
+                        <p>
+                          <strong>Duration:</strong>{' '}
+                          {flight.planned_departure_time} →{' '}
+                          {flight.planned_arrival_time}
+                        </p>
+                      </div>
+                    </InfoWindow>
+                  ) : null
+                })()}
+            </GoogleMap>
+          </LoadScript>
+        </div>
       </div>
     </div>
   )

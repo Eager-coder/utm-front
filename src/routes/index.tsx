@@ -155,10 +155,7 @@ function App() {
           <h2 className="text-xl font-semibold mb-3">Regulatory Authority</h2>
           <ul className="space-y-2">
             <li>
-              <Link
-                to="/reg-authority/organizations"
-                className={commonLinkStyle}
-              >
+              <Link to="/reg-authority" className={commonLinkStyle}>
                 RA Organizations
               </Link>
             </li>

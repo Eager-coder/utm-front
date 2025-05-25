@@ -7,13 +7,13 @@ export function RegAuthorityNavbar() {
       <h1 className="text-3xl font-bold">Regulation Authority</h1>
       <div className="flex gap-4">
         <Link
-          to="/reg-authority/organizations"
+          to="/reg-authority"
           className="rounded-md py-1 px-3 border border-zinc-300"
         >
           Organizations
         </Link>
         <Link
-          to="/reg-authority"
+          to="/reg-authority/flights-history"
           className="rounded-md py-1 px-3 border border-zinc-300"
         >
           History of flights

@@ -12,6 +12,7 @@ import {
 } from '@react-google-maps/api'
 import type { FlightRequestDto } from '@/api/flight-requests/createFlightRequest'
 import type { Drone } from '@/api/drone-management/createDrone'
+import { OrgPilotNavbar } from '@/components/OrgPilotNavbar'
 // import { OrgPilotNavbar } from '@/components/OrgPilotNavbar'
 
 export const Route = createFileRoute('/org-pilot/')({
@@ -45,9 +46,7 @@ function OrgPilotFlightRequests() {
   return (
     <div className="max-w-7xl mx-auto">
       {/* <OrgPilotNavbar /> */}
-      <h1 className="text-2xl font-bold mt-6 px-6">
-        Organization Pilot Dashboard
-      </h1>
+      <OrgPilotNavbar />
 
       <div className="p-6 flex h-full space-x-6 mt-10">
         {/* Left Panel */}
