@@ -19,7 +19,7 @@ function RouteComponent() {
   const mutation = useMutation({
     mutationFn: login, // Use the new login function
     onSuccess: async (data) => {
-      localStorage.setItem('accessToken', data.access_token)
+      localStorage.setItem('access_token', data.access_token)
       await refetchUser() // Refetch user info to update context
       navigate({ to: '/' }) // Redirect to main page
     },

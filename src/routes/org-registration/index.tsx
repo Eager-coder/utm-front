@@ -22,7 +22,7 @@ import apiClient from '@/api/apiClient'
 // ────────────────────────────────────────────────────────────────────────────────
 // 1️⃣  Schema & Type -----------------------------------------------------------------
 const registrationSchema = z.object({
-  name: z.string().min(2, 'Required'),
+  org_name: z.string().min(2, 'Required'),
   bin: z.string().length(12, 'BIN must be 12 digits'),
   company_address: z.string().min(2, 'Required'),
   city: z.string().min(2, 'Required'),
@@ -55,7 +55,7 @@ function OrganizationRegistrationPage() {
   const form = useForm<RegistrationValues>({
     resolver: zodResolver(registrationSchema),
     defaultValues: {
-      name: '',
+      org_name: '',
       bin: '',
       company_address: '',
       city: '',
@@ -100,7 +100,7 @@ function OrganizationRegistrationPage() {
               {/* Organization Name */}
               <FormField
                 control={form.control}
-                name="name"
+                name="org_name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Organization Name</FormLabel>

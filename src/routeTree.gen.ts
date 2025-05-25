@@ -12,11 +12,13 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
+import { Route as SoloPilotIndexImport } from './routes/solo-pilot/index'
 import { Route as PilotRegistrationIndexImport } from './routes/pilot-registration/index'
 import { Route as OrgRegistrationIndexImport } from './routes/org-registration/index'
 import { Route as OrgPilotIndexImport } from './routes/org-pilot/index'
 import { Route as OrgDashboardIndexImport } from './routes/org-dashboard/index'
 import { Route as LoginIndexImport } from './routes/login/index'
+import { Route as SoloPilotDroneManagementImport } from './routes/solo-pilot/drone-management'
 import { Route as RegAuthorityOrganizationsImport } from './routes/reg-authority/organizations'
 import { Route as PilotRegistrationSuccessImport } from './routes/pilot-registration/success'
 import { Route as OrgRegistrationSuccessImport } from './routes/org-registration/success'
@@ -30,6 +32,12 @@ import { Route as OrgDashboardFlightRequestsImport } from './routes/org-dashboar
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const SoloPilotIndexRoute = SoloPilotIndexImport.update({
+  id: '/solo-pilot/',
+  path: '/solo-pilot/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -60,6 +68,12 @@ const OrgDashboardIndexRoute = OrgDashboardIndexImport.update({
 const LoginIndexRoute = LoginIndexImport.update({
   id: '/login/',
   path: '/login/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const SoloPilotDroneManagementRoute = SoloPilotDroneManagementImport.update({
+  id: '/solo-pilot/drone-management',
+  path: '/solo-pilot/drone-management',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -167,6 +181,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegAuthorityOrganizationsImport
       parentRoute: typeof rootRoute
     }
+    '/solo-pilot/drone-management': {
+      id: '/solo-pilot/drone-management'
+      path: '/solo-pilot/drone-management'
+      fullPath: '/solo-pilot/drone-management'
+      preLoaderRoute: typeof SoloPilotDroneManagementImport
+      parentRoute: typeof rootRoute
+    }
     '/login/': {
       id: '/login/'
       path: '/login'
@@ -202,6 +223,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PilotRegistrationIndexImport
       parentRoute: typeof rootRoute
     }
+    '/solo-pilot/': {
+      id: '/solo-pilot/'
+      path: '/solo-pilot'
+      fullPath: '/solo-pilot'
+      preLoaderRoute: typeof SoloPilotIndexImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -216,11 +244,13 @@ export interface FileRoutesByFullPath {
   '/org-registration/success': typeof OrgRegistrationSuccessRoute
   '/pilot-registration/success': typeof PilotRegistrationSuccessRoute
   '/reg-authority/organizations': typeof RegAuthorityOrganizationsRoute
+  '/solo-pilot/drone-management': typeof SoloPilotDroneManagementRoute
   '/login': typeof LoginIndexRoute
   '/org-dashboard': typeof OrgDashboardIndexRoute
   '/org-pilot': typeof OrgPilotIndexRoute
   '/org-registration': typeof OrgRegistrationIndexRoute
   '/pilot-registration': typeof PilotRegistrationIndexRoute
+  '/solo-pilot': typeof SoloPilotIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -232,11 +262,13 @@ export interface FileRoutesByTo {
   '/org-registration/success': typeof OrgRegistrationSuccessRoute
   '/pilot-registration/success': typeof PilotRegistrationSuccessRoute
   '/reg-authority/organizations': typeof RegAuthorityOrganizationsRoute
+  '/solo-pilot/drone-management': typeof SoloPilotDroneManagementRoute
   '/login': typeof LoginIndexRoute
   '/org-dashboard': typeof OrgDashboardIndexRoute
   '/org-pilot': typeof OrgPilotIndexRoute
   '/org-registration': typeof OrgRegistrationIndexRoute
   '/pilot-registration': typeof PilotRegistrationIndexRoute
+  '/solo-pilot': typeof SoloPilotIndexRoute
 }
 
 export interface FileRoutesById {
@@ -249,11 +281,13 @@ export interface FileRoutesById {
   '/org-registration/success': typeof OrgRegistrationSuccessRoute
   '/pilot-registration/success': typeof PilotRegistrationSuccessRoute
   '/reg-authority/organizations': typeof RegAuthorityOrganizationsRoute
+  '/solo-pilot/drone-management': typeof SoloPilotDroneManagementRoute
   '/login/': typeof LoginIndexRoute
   '/org-dashboard/': typeof OrgDashboardIndexRoute
   '/org-pilot/': typeof OrgPilotIndexRoute
   '/org-registration/': typeof OrgRegistrationIndexRoute
   '/pilot-registration/': typeof PilotRegistrationIndexRoute
+  '/solo-pilot/': typeof SoloPilotIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -267,11 +301,13 @@ export interface FileRouteTypes {
     | '/org-registration/success'
     | '/pilot-registration/success'
     | '/reg-authority/organizations'
+    | '/solo-pilot/drone-management'
     | '/login'
     | '/org-dashboard'
     | '/org-pilot'
     | '/org-registration'
     | '/pilot-registration'
+    | '/solo-pilot'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -282,11 +318,13 @@ export interface FileRouteTypes {
     | '/org-registration/success'
     | '/pilot-registration/success'
     | '/reg-authority/organizations'
+    | '/solo-pilot/drone-management'
     | '/login'
     | '/org-dashboard'
     | '/org-pilot'
     | '/org-registration'
     | '/pilot-registration'
+    | '/solo-pilot'
   id:
     | '__root__'
     | '/'
@@ -297,11 +335,13 @@ export interface FileRouteTypes {
     | '/org-registration/success'
     | '/pilot-registration/success'
     | '/reg-authority/organizations'
+    | '/solo-pilot/drone-management'
     | '/login/'
     | '/org-dashboard/'
     | '/org-pilot/'
     | '/org-registration/'
     | '/pilot-registration/'
+    | '/solo-pilot/'
   fileRoutesById: FileRoutesById
 }
 
@@ -314,11 +354,13 @@ export interface RootRouteChildren {
   OrgRegistrationSuccessRoute: typeof OrgRegistrationSuccessRoute
   PilotRegistrationSuccessRoute: typeof PilotRegistrationSuccessRoute
   RegAuthorityOrganizationsRoute: typeof RegAuthorityOrganizationsRoute
+  SoloPilotDroneManagementRoute: typeof SoloPilotDroneManagementRoute
   LoginIndexRoute: typeof LoginIndexRoute
   OrgDashboardIndexRoute: typeof OrgDashboardIndexRoute
   OrgPilotIndexRoute: typeof OrgPilotIndexRoute
   OrgRegistrationIndexRoute: typeof OrgRegistrationIndexRoute
   PilotRegistrationIndexRoute: typeof PilotRegistrationIndexRoute
+  SoloPilotIndexRoute: typeof SoloPilotIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -330,11 +372,13 @@ const rootRouteChildren: RootRouteChildren = {
   OrgRegistrationSuccessRoute: OrgRegistrationSuccessRoute,
   PilotRegistrationSuccessRoute: PilotRegistrationSuccessRoute,
   RegAuthorityOrganizationsRoute: RegAuthorityOrganizationsRoute,
+  SoloPilotDroneManagementRoute: SoloPilotDroneManagementRoute,
   LoginIndexRoute: LoginIndexRoute,
   OrgDashboardIndexRoute: OrgDashboardIndexRoute,
   OrgPilotIndexRoute: OrgPilotIndexRoute,
   OrgRegistrationIndexRoute: OrgRegistrationIndexRoute,
   PilotRegistrationIndexRoute: PilotRegistrationIndexRoute,
+  SoloPilotIndexRoute: SoloPilotIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -355,11 +399,13 @@ export const routeTree = rootRoute
         "/org-registration/success",
         "/pilot-registration/success",
         "/reg-authority/organizations",
+        "/solo-pilot/drone-management",
         "/login/",
         "/org-dashboard/",
         "/org-pilot/",
         "/org-registration/",
-        "/pilot-registration/"
+        "/pilot-registration/",
+        "/solo-pilot/"
       ]
     },
     "/": {
@@ -386,6 +432,9 @@ export const routeTree = rootRoute
     "/reg-authority/organizations": {
       "filePath": "reg-authority/organizations.tsx"
     },
+    "/solo-pilot/drone-management": {
+      "filePath": "solo-pilot/drone-management.tsx"
+    },
     "/login/": {
       "filePath": "login/index.tsx"
     },
@@ -400,6 +449,9 @@ export const routeTree = rootRoute
     },
     "/pilot-registration/": {
       "filePath": "pilot-registration/index.tsx"
+    },
+    "/solo-pilot/": {
+      "filePath": "solo-pilot/index.tsx"
     }
   }
 }
