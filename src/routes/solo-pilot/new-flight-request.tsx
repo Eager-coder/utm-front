@@ -1,5 +1,5 @@
 // src/routes/org-dashboard/new-flight-request.tsx
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { LoadScript, GoogleMap, Marker, Polyline } from '@react-google-maps/api'
+import { ArrowLeft } from 'lucide-react'
 
 export const Route = createFileRoute('/solo-pilot/new-flight-request')({
   component: NewFlightRequestPage,
@@ -119,13 +120,28 @@ function NewFlightRequestPage() {
 
   return (
     <div className="p-6 space-y-4">
-      <div className="flex items-center mb-4">
-        <Button
-          variant="outline"
-          onClick={() => navigate({ to: '/solo-pilot' })}
-        >
-          Back
-        </Button>
+      <nav className="flex justify-between">
+        <h1 className="text-3xl font-bold">Solo pilot dashboard</h1>
+        <div className="flex gap-4">
+          <Link
+            to="/solo-pilot/drone-management"
+            className="rounded-md py-1 px-3 border border-zinc-300"
+          >
+            Drone management
+          </Link>
+          <Link
+            className="rounded-md py-1 px-3 border bg-zinc-900 font-medium text-white  border-zinc-300"
+            to="/solo-pilot/new-flight-request"
+          >
+            New flight request
+          </Link>
+        </div>
+      </nav>
+      <Button variant="outline" onClick={() => navigate({ to: '/solo-pilot' })}>
+        <ArrowLeft />
+        Back
+      </Button>
+      <div className="flex items-center mt-10 mb-4">
         <h2 className="text-xl font-semibold ml-4">New Flight Request</h2>
       </div>
 
