@@ -1,5 +1,5 @@
 // src/routes/organization-registration.page.tsx
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -250,8 +250,20 @@ function OrganizationRegistrationPage() {
               </Button>
             </form>
           </Form>
+          <Link
+            className="block mt-4  text-center text-blue-700 mx-auto w-full"
+            to="/pilot-registration"
+          >
+            Register as Individual Pilot
+          </Link>{' '}
+          <Link
+            className="block mt-2  text-center text-blue-700 mx-auto w-full"
+            to="/login"
+          >
+            Login
+          </Link>
         </CardContent>
-      </Card>
+      </Card>{' '}
     </div>
   )
 }

@@ -1,6 +1,6 @@
 // src/routes/PilotRegistrationPage.tsx
 import React, { useState } from 'react'
-import { useNavigate } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import apiClient from '@/api/apiClient'
 import {
@@ -118,7 +118,6 @@ export function PilotRegistrationPage() {
           onChange={(e) => setFullName(e.target.value)}
           required
         />
-
         <Input
           type="email"
           placeholder="Email"
@@ -126,7 +125,6 @@ export function PilotRegistrationPage() {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-
         <Input
           type="password"
           placeholder="Password"
@@ -134,7 +132,6 @@ export function PilotRegistrationPage() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-
         <Input
           type="tel"
           placeholder="Phone number"
@@ -142,14 +139,12 @@ export function PilotRegistrationPage() {
           onChange={(e) => setPhone(e.target.value)}
           required
         />
-
         <Input
           placeholder="IIN"
           value={iin}
           onChange={(e) => setIin(e.target.value)}
           required
         />
-
         <div className="space-y-2">
           <label className="flex items-center">
             <Checkbox
@@ -174,7 +169,6 @@ export function PilotRegistrationPage() {
             <span className="ml-2">Organization member</span>
           </label>
         </div>
-
         {orgMember && (
           <Select
             onValueChange={(val) => setOrgId(Number(val))}
@@ -194,10 +188,21 @@ export function PilotRegistrationPage() {
             </SelectContent>
           </Select>
         )}
-
         <Button type="submit" disabled={isSubmitting} className="w-full">
           {isSubmitting ? 'Submitting…' : 'Submit'}
         </Button>
+        <Link
+          className="block mt-4  text-center text-blue-700 mx-auto w-full"
+          to="/org-registration"
+        >
+          Register as Organization
+        </Link>{' '}
+        <Link
+          className="block mt-1  text-center text-blue-700 mx-auto w-full"
+          to="/login"
+        >
+          Login
+        </Link>
       </form>
     </div>
   )

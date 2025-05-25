@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useMutation } from '@tanstack/react-query'
 import { login, type LoginCredentials } from '../../api/user/login' // Import new login function and types
 import { useUser } from '../../contexts/UserContext' // Import useUser hook
@@ -57,6 +57,10 @@ function RouteComponent() {
         <Button type="submit" className="w-full" disabled={mutation.isPending}>
           {mutation.isPending ? 'Logging in...' : 'Login'}
         </Button>
+        <div className="flex flex-row justify-between mt-5 text-sm text-blue-700">
+          <Link to="/org-registration">Register as Organization</Link>
+          <Link to="/pilot-registration">Register as Individual Pilot</Link>
+        </div>
       </form>
     </div>
   )
