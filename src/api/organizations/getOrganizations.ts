@@ -5,13 +5,19 @@ import apiClient from '../apiClient'
 /**
  * Organization object returned by the API
  */
+// --- Interfaces ---
 export interface Organization {
   id: number
   name: string
+  email: string
+  phone_number: string
   bin: string
-  company_address: string
   city: string
+  company_address: string
+  admin_id: number
   is_active: boolean
+  created_at: string
+  updated_at: string
 }
 
 /**
