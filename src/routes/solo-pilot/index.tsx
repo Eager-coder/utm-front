@@ -1,297 +1,367 @@
-import { createFileRoute } from '@tanstack/react-router'
+// src/routes/org-dashboard/flight-requests.tsx
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
+import { getMyDrones } from '@/api/drone-management/getMyDrones'
+import type { Drone } from '@/api/drone-management/createDrone'
+import type { FlightRequestDto } from '@/api/flight-requests/createFlightRequest'
+import {
+  createFlightRequest,
+  type CreateFlightRequest as CreateFlightRequestPayload,
+  type Waypoint,
+} from '@/api/flight-requests/createFlightRequest'
+import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { Button } from '@/components/ui/button'
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from '@/components/ui/popover'
+import { GoogleMap, LoadScript, Marker, Polyline } from '@react-google-maps/api'
 import {
   Dialog,
+  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog'
-import { Pencil } from 'lucide-react'
-import { useState } from 'react'
-import { GoogleMap, LoadScript, Marker, Polyline } from '@react-google-maps/api'
+import { getMyFlighRequests } from '@/api/flight-requests/getMyFlightRequests'
 
 export const Route = createFileRoute('/solo-pilot/')({
-  component: SoloPilotDashboard,
+  component: FlightRequests,
 })
 
-const initialDrones = [
-  { id: 'dr1', brand: 'DJI', model: 'Mavic Pro', serial_number: '1231312' },
-  { id: 'dr2', brand: 'Parrot', model: 'Anafi', serial_number: '8833821' },
-]
+function FlightRequests() {
+  const [isOpen, setIsOpen] = useState(false)
+  const { data: flights = [], isLoading: loadingFlights } = useQuery<
+    FlightRequestDto[]
+  >({
+    queryKey: ['myFlights'],
+    queryFn: getMyFlighRequests,
+  })
+  const navigate = useNavigate()
+  const [hoveredId, setHoveredId] = useState<number | null>(null)
 
-const mockFlightRequests = [
-  {
-    id: 'req1',
-    drone: 'dr1',
-    status: 'APPROVED',
-    createdAt: '2024-05-01T10:00:00Z',
-  },
-  {
-    id: 'req2',
-    drone: 'dr2',
-    status: 'PENDING',
-    createdAt: '2024-05-04T14:30:00Z',
-  },
-]
+  return (
+    <div className="p-6 flex h-full">
+      {/* Sidebar with list and create button */}
+      <div className="w-1/3 pr-4 overflow-auto">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">Flight Requests</h2>
+          <Button onClick={() => setIsOpen(true)}>Create</Button>
+        </div>
+        {loadingFlights ? (
+          <p>Loading...</p>
+        ) : (
+          <ul className="space-y-2">
+            {flights.map((flight) => (
+              <li
+                key={flight.id}
+                className="p-2 border rounded cursor-pointer hover:bg-gray-100"
+                onMouseEnter={() => setHoveredId(flight.id)}
+                onMouseLeave={() => setHoveredId(null)}
+              >
+                <p>ID: {flight.id}</p>
+                <p>Status: {flight.status}</p>
+                <p>Drone: {flight.drone_id}</p>
+              </li>
+            ))}
+          </ul>
+        )}
 
-function SoloPilotDashboard() {
-  const [myDrones, setMyDrones] = useState(initialDrones)
-  const [editDrone, setEditDrone] = useState<
-    (typeof initialDrones)[number] | null
-  >(null)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+        {/* Create Request Modal */}
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogTrigger asChild />
+          <DialogContent className="w-[90vw] max-w-4xl">
+            <DialogHeader>
+              <DialogTitle>New Flight Request</DialogTitle>
+              <DialogDescription>
+                Fill out the details below and set waypoints on map.
+              </DialogDescription>
+            </DialogHeader>
+            <NewFlightRequest onClose={() => setIsOpen(false)} />
+          </DialogContent>
+        </Dialog>
+      </div>
 
-  const handleEdit = (drone: (typeof initialDrones)[number]) => {
-    setEditDrone(drone)
-    setIsDialogOpen(true)
-  }
+      {/* Map displaying all routes */}
+      <div className="w-2/3 h-full">
+        <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAP_API_KEY}>
+          <GoogleMap
+            mapContainerStyle={{ width: '100%', height: '100%' }}
+            center={
+              flights[0]?.waypoints?.[0]
+                ? {
+                    lat: flights[0].waypoints[0].latitude,
+                    lng: flights[0].waypoints[0].longitude,
+                  }
+                : { lat: 51.13, lng: 71.43 }
+            }
+            zoom={12}
+          >
+            {flights.map((flight) => {
+              const path = flight.waypoints as Waypoint[]
+              return (
+                <Polyline
+                  key={flight.id}
+                  path={path.map((wp) => ({
+                    lat: wp.latitude,
+                    lng: wp.longitude,
+                  }))}
+                  options={{
+                    strokeColor:
+                      flight.id === hoveredId ? '#FF0000' : '#AA0000',
+                    strokeWeight: flight.id === hoveredId ? 6 : 2,
+                  }}
+                  onMouseOver={() => setHoveredId(flight.id)}
+                  onMouseOut={() => setHoveredId(null)}
+                />
+              )
+            })}
 
-  const handleSaveDrone = () => {
-    if (!editDrone) return
-    setMyDrones((prev) => {
-      const index = prev.findIndex((d) => d.id === editDrone.id)
-      if (index === -1) return prev
-      const updated = [...prev]
-      updated[index] = editDrone
-      return updated
-    })
-    setIsDialogOpen(false)
-  }
+            {flights.map((flight) =>
+              (flight.waypoints as Waypoint[]).map((wp, idx) => (
+                <Marker
+                  key={`${flight.id}-${idx}`}
+                  position={{ lat: wp.latitude, lng: wp.longitude }}
+                  onMouseOver={() => setHoveredId(flight.id)}
+                  onMouseOut={() => setHoveredId(null)}
+                >
+                  {hoveredId === flight.id && (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <div />
+                      </PopoverTrigger>
+                      <PopoverContent>
+                        <p>
+                          <strong>ID:</strong> {flight.id}
+                        </p>
+                        <p>
+                          <strong>Status:</strong> {flight.status}
+                        </p>
+                        <p>
+                          <strong>Drone:</strong> {flight.drone_id}
+                        </p>
+                        <p>
+                          <strong>Departure:</strong>{' '}
+                          {flight.planned_departure_time}
+                        </p>
+                        <p>
+                          <strong>Arrival:</strong>{' '}
+                          {flight.planned_arrival_time}
+                        </p>
+                        {flight.notes && (
+                          <p>
+                            <strong>Notes:</strong> {flight.notes.join(', ')}
+                          </p>
+                        )}
+                      </PopoverContent>
+                    </Popover>
+                  )}
+                </Marker>
+              )),
+            )}
+          </GoogleMap>
+        </LoadScript>
+      </div>
+    </div>
+  )
+}
 
-  const handleAddNewDrone = () => {
-    const newDrone = {
-      id: crypto.randomUUID(),
-      brand: '',
-      model: '',
-      serial_number: '',
-    }
-    setEditDrone(newDrone)
-    setIsDialogOpen(true)
-  }
+interface NewFlightRequestProps {
+  onClose: () => void
+}
 
-  const qc = useQueryClient()
-  const [flightForm, setFlightForm] = useState({
-    drone_id: 'dr1',
-    from: '',
-    to: '',
-    altitude: '',
+function NewFlightRequest({ onClose }: NewFlightRequestProps) {
+  const [form, setForm] = useState({
+    planned_departure_time: '',
+    planned_arrival_time: '',
+    altitude_m: '',
     notes: '',
     waypoints: [] as google.maps.LatLngLiteral[],
+    drone_id: '',
   })
+
+  const { data: drones, isLoading: dronesLoading } = useQuery<Drone[], Error>({
+    queryKey: ['myDrones'],
+    queryFn: getMyDrones,
+  })
+  const queryClient = useQueryClient()
+
+  useEffect(() => {
+    if (drones && drones.length > 0) {
+      setForm((prev) => ({ ...prev, drone_id: String(drones[0].id) }))
+    }
+  }, [drones])
+
+  const mutation = useMutation<any, Error, CreateFlightRequestPayload>({
+    mutationFn: createFlightRequest,
+    onSuccess: () => {
+      toast.success('Flight request created successfully!')
+      queryClient.invalidateQueries({ queryKey: ['myFlights'] })
+      onClose()
+    },
+    onError: (error) => {
+      toast.error(`Failed to create flight request: ${error.message}`)
+    },
+  })
+
+  const center = { lat: 51.13, lng: 71.43 }
+  const containerStyle = { width: '100%', height: '400px' }
 
   const handleMapClick = (e: google.maps.MapMouseEvent) => {
     if (e.latLng) {
-      const coord = { lat: e.latLng.lat(), lng: e.latLng.lng() }
-      setFlightForm((prev) => ({
+      setForm((prev) => ({
         ...prev,
-        waypoints: [...prev.waypoints, coord],
+        waypoints: [
+          ...prev.waypoints,
+          { lat: e.latLng.lat(), lng: e.latLng.lng() },
+        ],
       }))
     }
   }
 
-  const handleDrag = (e: google.maps.MapMouseEvent, index: number) => {
+  const handleDrag = (e: google.maps.MapMouseEvent, idx: number) => {
     if (e.latLng) {
-      const updated = [...flightForm.waypoints]
-      updated[index] = { lat: e.latLng.lat(), lng: e.latLng.lng() }
-      setFlightForm({ ...flightForm, waypoints: updated })
+      const updated = [...form.waypoints]
+      updated[idx] = { lat: e.latLng.lat(), lng: e.latLng.lng() }
+      setForm((prev) => ({ ...prev, waypoints: updated }))
     }
   }
 
-  const removeWaypoint = (index: number) => {
-    const updated = flightForm.waypoints.filter((_, i) => i !== index)
-    setFlightForm({ ...flightForm, waypoints: updated })
+  const removeWaypoint = (idx: number) => {
+    setForm((prev) => ({
+      ...prev,
+      waypoints: prev.waypoints.filter((_, i) => i !== idx),
+    }))
   }
 
-  const submitFlight = useMutation({
-    mutationFn: async () => {
-      const payload = {
-        ...flightForm,
-        from: new Date(flightForm.from).toISOString(),
-        to: new Date(flightForm.to).toISOString(),
-      }
-      console.log('[MOCK] Submit solo flight request:', payload)
-    },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['solo-flight-requests'] })
-    },
-  })
+  const handleSubmit = () => {
+    if (!form.drone_id) return toast.error('No drone available.')
+    if (form.waypoints.length === 0)
+      return toast.error('Add at least one waypoint.')
+    if (!form.planned_departure_time || !form.planned_arrival_time)
+      return toast.error('Select departure and arrival times.')
+    if (!form.altitude_m) return toast.error('Enter altitude.')
 
-  const { data: requests = [] } = useQuery({
-    queryKey: ['solo-flight-requests'],
-    queryFn: async () => mockFlightRequests,
-  })
+    const waypointsPayload: Waypoint[] = form.waypoints.map((wp, i) => ({
+      latitude: wp.lat,
+      longitude: wp.lng,
+      altitude_m: parseFloat(form.altitude_m),
+      sequence_order: i + 1,
+    }))
 
-  const center = { lat: 51.13, lng: 71.43 }
+    const payload: CreateFlightRequestPayload = {
+      drone_id: parseInt(form.drone_id, 10),
+      planned_departure_time: new Date(
+        form.planned_departure_time,
+      ).toISOString(),
+      planned_arrival_time: new Date(form.planned_arrival_time).toISOString(),
+      notes: form.notes.split(',').map((n) => n.trim()),
+      waypoints: waypointsPayload,
+    }
+
+    mutation.mutate(payload)
+  }
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-xl font-semibold">Solo Pilot Dashboard</h1>
-      {/* Drone Management */}
-      <Card className="p-4">
-        <h2 className="font-medium mb-4">Drone Management</h2>
-        <table className="w-full text-sm">
-          <thead>
-            <tr>
-              <th className="text-left">Brand</th>
-              <th className="text-left">Model</th>
-              <th className="text-left">Serial Number</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {myDrones.map((d) => (
-              <tr key={d.id} className="group hover:bg-muted border-t">
-                <td>{d.brand}</td>
-                <td>{d.model}</td>
-                <td>{d.serial_number}</td>
-                <td>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="opacity-0 group-hover:opacity-100"
-                    onClick={() => handleEdit(d)}
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <Button className="mt-4" onClick={handleAddNewDrone}>
-          + Add Drone
-        </Button>
-      </Card>
-      {/* Drone Modal */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {editDrone?.id ? 'Edit Drone' : 'Add Drone'}
-            </DialogTitle>
-          </DialogHeader>
-          {editDrone && (
-            <div className="space-y-2">
-              <Input
-                placeholder="Brand"
-                value={editDrone.brand}
-                onChange={(e) =>
-                  setEditDrone({ ...editDrone, brand: e.target.value })
-                }
-              />
-              <Input
-                placeholder="Model"
-                value={editDrone.model}
-                onChange={(e) =>
-                  setEditDrone({ ...editDrone, model: e.target.value })
-                }
-              />
-              <Input
-                placeholder="Serial Number"
-                value={editDrone.serial_number}
-                onChange={(e) =>
-                  setEditDrone({ ...editDrone, serial_number: e.target.value })
-                }
-              />
-              <div className="flex justify-end gap-2">
-                <Button onClick={handleSaveDrone}>Save</Button>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-      {/* New Request with Map */}
-      <Card className="p-4 space-y-2">
-        <h2 className="font-medium">New Flight Request</h2>
-        <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAP_API_KEY}>
-          <GoogleMap
-            mapContainerStyle={{ width: '100%', height: '200px' }}
-            center={center}
-            zoom={14}
-            onClick={handleMapClick}
-          >
-            {flightForm.waypoints.map((point, idx) => (
-              <Marker
-                key={idx}
-                position={point}
-                label={`${idx + 1}`}
-                draggable
-                onDragEnd={(e) => handleDrag(e, idx)}
-                onRightClick={() => removeWaypoint(idx)}
-              />
-            ))}
-            <Polyline
-              path={flightForm.waypoints}
-              options={{ strokeColor: '#007bff', strokeWeight: 2 }}
+    <div className="space-y-4">
+      <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAP_API_KEY}>
+        <GoogleMap
+          mapContainerStyle={containerStyle}
+          center={center}
+          zoom={14}
+          onClick={handleMapClick}
+        >
+          {form.waypoints.map((pt, i) => (
+            <Marker
+              key={i}
+              position={pt}
+              label={`${i + 1}`}
+              draggable
+              onDragEnd={(e) => handleDrag(e, i)}
+              onRightClick={() => removeWaypoint(i)}
             />
-          </GoogleMap>
-        </LoadScript>
-        <div className="grid grid-cols-2 gap-2">
-          <Input
-            type="datetime-local"
-            value={flightForm.from}
-            onChange={(e) =>
-              setFlightForm({ ...flightForm, from: e.target.value })
-            }
-            className="appearance-none"
+          ))}
+          <Polyline
+            path={form.waypoints}
+            options={{ strokeColor: '#007bff', strokeWeight: 2 }}
           />
+        </GoogleMap>
+      </LoadScript>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label>Drone</Label>
+          {dronesLoading ? (
+            <p>Loading...</p>
+          ) : drones && drones.length > 0 ? (
+            <p>{`${drones[0].brand} ${drones[0].model} (SN: ${drones[0].serial_number})`}</p>
+          ) : (
+            <p>No drones available</p>
+          )}
+        </div>
+        <div>
+          <Label htmlFor="altitude">Altitude (m)</Label>
           <Input
-            type="datetime-local"
-            value={flightForm.to}
-            onChange={(e) =>
-              setFlightForm({ ...flightForm, to: e.target.value })
-            }
-            className="appearance-none"
-          />
-          <Input
+            id="altitude"
+            type="number"
             placeholder="Altitude (m)"
-            value={flightForm.altitude}
+            value={form.altitude_m}
             onChange={(e) =>
-              setFlightForm({ ...flightForm, altitude: e.target.value })
+              setForm((prev) => ({ ...prev, altitude_m: e.target.value }))
             }
           />
         </div>
-        <Textarea
-          placeholder="Notes"
-          value={flightForm.notes}
-          onChange={(e) =>
-            setFlightForm({ ...flightForm, notes: e.target.value })
-          }
-        />
-        <Button onClick={() => submitFlight.mutate()}>Submit</Button>
-      </Card>
-      {/* My Requests */}
-      <Card className="p-4">
-        <h2 className="font-medium mb-2">My Flight Requests</h2>
-        <table className="w-full text-sm">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Status</th>
-              <th>Created</th>
-              <th>Details</th>
-            </tr>
-          </thead>
-          <tbody>
-            {requests.map((r) => (
-              <tr key={r.id} className="border-t">
-                <td>{r.id}</td>
-                <td>{r.status}</td>
-                <td>{new Date(r.createdAt).toLocaleString()}</td>
-                <td>
-                  <Button variant="link" size="sm">
-                    View
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </Card>
+        <div>
+          <Label htmlFor="departure_time">Departure Time</Label>
+          <Input
+            id="departure_time"
+            type="datetime-local"
+            value={form.planned_departure_time}
+            onChange={(e) =>
+              setForm((prev) => ({
+                ...prev,
+                planned_departure_time: e.target.value,
+              }))
+            }
+          />
+        </div>
+        <div>
+          <Label htmlFor="arrival_time">Arrival Time</Label>
+          <Input
+            id="arrival_time"
+            type="datetime-local"
+            value={form.planned_arrival_time}
+            onChange={(e) =>
+              setForm((prev) => ({
+                ...prev,
+                planned_arrival_time: e.target.value,
+              }))
+            }
+          />
+        </div>
+      </div>
+
+      <Textarea
+        placeholder="Notes (comma-separated)"
+        value={form.notes}
+        onChange={(e) =>
+          setForm((prev) => ({ ...prev, notes: e.target.value }))
+        }
+      />
+      <div className="flex justify-end space-x-2">
+        <Button variant="outline" onClick={onClose}>
+          Cancel
+        </Button>
+        <Button onClick={handleSubmit} disabled={mutation.isPending}>
+          {mutation.isPending ? 'Submitting...' : 'Submit'}
+        </Button>
+      </div>
     </div>
   )
 }

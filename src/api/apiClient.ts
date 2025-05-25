@@ -16,7 +16,7 @@ const createApiClient = (baseURL: string): AxiosInstance => {
   // Request interceptor: add auth token if present
   client.interceptors.request.use(
     (config) => {
-      const token = localStorage.getItem('accessToken')
+      const token = localStorage.getItem('access_token')
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`
       }

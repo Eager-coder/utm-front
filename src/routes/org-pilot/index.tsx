@@ -1,207 +1,252 @@
-import { createFileRoute } from '@tanstack/react-router'
+// src/routes/org-dashboard/flight-requests.tsx
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
+import { getMyDrones } from '@/api/drone-management/getMyDrones'
+import type { Drone } from '@/api/drone-management/createDrone'
+import {
+  createFlightRequest,
+  type CreateFlightRequest as CreateFlightRequestPayload,
+  type Waypoint,
+} from '@/api/flight-requests/createFlightRequest'
+import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { useState } from 'react'
+import { Button } from '@/components/ui/button'
 import { GoogleMap, LoadScript, Marker, Polyline } from '@react-google-maps/api'
-// import { formatISO } from 'date-fns'
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+} from '@/components/ui/dialog'
 
 export const Route = createFileRoute('/org-pilot/')({
-  component: OrgPilotDashboard,
+  component: FlightRequests,
 })
 
-const mockAssignedDrones = [
-  { id: 'dr1', brand: 'DJI', model: 'Mavic Pro', serial_number: '1231312' },
-  { id: 'dr2', brand: 'DJI', model: 'Birmarse', serial_number: '54623434' },
-]
+function FlightRequests() {
+  const [isOpen, setIsOpen] = useState(false)
+  const navigate = useNavigate()
 
-const mockRequests = [
-  {
-    id: 'fl1',
-    drone: 'dr1',
-    time: '10:00–11:00',
-    status: 'APPROVED',
-    submitted: '2024-05-25T08:00:00.000Z',
-  },
-  {
-    id: 'fl2',
-    drone: 'dr2',
-    time: '13:00–14:00',
-    status: 'PENDING',
-    submitted: '2024-05-25T09:30:00.000Z',
-  },
-]
+  return (
+    <div className="p-6">
+      <h1 className="text-xl font-semibold mb-4">Flight Requests</h1>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogTrigger asChild>
+          <Button>Create Request</Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-7xl  min-w-[calc(90vw)]">
+          <DialogHeader>
+            <DialogTitle>New Flight Request</DialogTitle>
+            <DialogDescription>
+              Fill out the details below and set waypoints on map.
+            </DialogDescription>
+          </DialogHeader>
+          <NewFlightRequest onClose={() => setIsOpen(false)} />
+        </DialogContent>
+      </Dialog>
+      {/* TODO: list existing flight requests here */}
+    </div>
+  )
+}
 
-function OrgPilotDashboard() {
-  const [flightForm, setFlightForm] = useState({
-    drone_id: 'dr1',
-    from: '',
-    to: '',
-    altitude: '',
+interface NewFlightRequestProps {
+  onClose: () => void
+}
+
+function NewFlightRequest({ onClose }: NewFlightRequestProps) {
+  const [form, setForm] = useState({
+    planned_departure_time: '',
+    planned_arrival_time: '',
+    altitude_m: '',
     notes: '',
     waypoints: [] as google.maps.LatLngLiteral[],
+    drone_id: '',
   })
 
-  const qc = useQueryClient()
+  const { data: drones, isLoading: dronesLoading } = useQuery<Drone[], Error>({
+    queryKey: ['myDrones'],
+    queryFn: getMyDrones,
+  })
+  const queryClient = useQueryClient()
+
+  // Auto select first drone
+  useEffect(() => {
+    if (drones && drones.length > 0) {
+      setForm((prev) => ({ ...prev, drone_id: String(drones[0].id) }))
+    }
+  }, [drones])
+
+  const mutation = useMutation<any, Error, CreateFlightRequestPayload>({
+    mutationFn: createFlightRequest,
+    onSuccess: () => {
+      toast.success('Flight request created successfully!')
+      queryClient.invalidateQueries({ queryKey: ['flightRequests'] })
+      onClose()
+    },
+    onError: (error) => {
+      toast.error(`Failed to create flight request: ${error.message}`)
+    },
+  })
+
+  const center = { lat: 51.13, lng: 71.43 }
+  const containerStyle = { width: '100%', height: '300px' }
 
   const handleMapClick = (e: google.maps.MapMouseEvent) => {
     if (e.latLng) {
-      const coord = { lat: e.latLng.lat(), lng: e.latLng.lng() }
-      setFlightForm((prev) => ({
+      setForm((prev) => ({
         ...prev,
-        waypoints: [...prev.waypoints, coord],
+        waypoints: [
+          ...prev.waypoints,
+          // @ts-expect-error
+          { lat: e.latLng.lat(), lng: e.latLng.lng() },
+        ],
       }))
     }
   }
 
-  const handleDrag = (e: google.maps.MapMouseEvent, index: number) => {
+  const handleDrag = (e: google.maps.MapMouseEvent, idx: number) => {
     if (e.latLng) {
-      const updated = [...flightForm.waypoints]
-      updated[index] = { lat: e.latLng.lat(), lng: e.latLng.lng() }
-      setFlightForm({ ...flightForm, waypoints: updated })
+      const updated = [...form.waypoints]
+      updated[idx] = { lat: e.latLng.lat(), lng: e.latLng.lng() }
+      setForm((prev) => ({ ...prev, waypoints: updated }))
     }
   }
 
-  const removeWaypoint = (index: number) => {
-    const updated = flightForm.waypoints.filter((_, i) => i !== index)
-    setFlightForm({ ...flightForm, waypoints: updated })
+  const removeWaypoint = (idx: number) => {
+    setForm((prev) => ({
+      ...prev,
+      waypoints: prev.waypoints.filter((_, i) => i !== idx),
+    }))
   }
 
-  const submitFlight = useMutation({
-    mutationFn: async () => {
-      const payload = {
-        ...flightForm,
-        from: new Date(flightForm.from).toISOString(),
-        to: new Date(flightForm.to).toISOString(),
-      }
-      console.log('🔁 [MOCK] Submitting flight plan', payload)
-    },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['pilot-requests'] })
-    },
-  })
+  const handleSubmit = () => {
+    if (!form.drone_id) return toast.error('No drone available.')
+    if (form.waypoints.length === 0)
+      return toast.error('Add at least one waypoint.')
+    if (!form.planned_departure_time || !form.planned_arrival_time)
+      return toast.error('Select departure and arrival times.')
+    if (!form.altitude_m) return toast.error('Enter altitude.')
 
-  const { data: requests = [] } = useQuery({
-    queryKey: ['pilot-requests'],
-    queryFn: async () => mockRequests,
-  })
+    const waypointsPayload: Waypoint[] = form.waypoints.map((wp, i) => ({
+      latitude: wp.lat,
+      longitude: wp.lng,
+      altitude_m: parseFloat(form.altitude_m),
+      sequence_order: i + 1,
+    }))
 
-  const center = { lat: 51.13, lng: 71.43 }
-  const containerStyle = { width: '100%', height: '200px' }
+    const payload: CreateFlightRequestPayload = {
+      drone_id: parseInt(form.drone_id, 10),
+      planned_departure_time: new Date(
+        form.planned_departure_time,
+      ).toISOString(),
+      planned_arrival_time: new Date(form.planned_arrival_time).toISOString(),
+      notes: form.notes,
+      waypoints: waypointsPayload,
+    }
+
+    mutation.mutate(payload)
+  }
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-xl font-semibold">Organization Pilot Dashboard</h1>
-
-      {/* Assigned drones */}
-      <Card className="p-4">
-        <h2 className="font-medium mb-2">My Assigned Drones</h2>
-        <ul className="text-sm space-y-1">
-          {mockAssignedDrones.map((d) => (
-            <li key={d.id}>
-              {d.brand} {d.model} — <code>{d.serial_number}</code>
-            </li>
-          ))}
-        </ul>
-      </Card>
-
-      {/* Flight request form */}
-      <Card className="p-4 space-y-2">
-        <h2 className="font-medium">Submit New Flight Request</h2>
-        <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAP_API_KEY}>
-          <GoogleMap
-            mapContainerStyle={containerStyle}
-            center={center}
-            zoom={14}
-            onClick={handleMapClick}
-          >
-            {flightForm.waypoints.map((point, idx) => (
-              <Marker
-                key={idx}
-                position={point}
-                label={`${idx + 1}`}
-                draggable
-                onDragEnd={(e) => handleDrag(e, idx)}
-                onRightClick={() => removeWaypoint(idx)}
-              />
-            ))}
-            <Polyline
-              path={flightForm.waypoints}
-              options={{ strokeColor: '#007bff', strokeWeight: 2 }}
+    <div className="space-y-4">
+      <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAP_API_KEY}>
+        <GoogleMap
+          mapContainerStyle={containerStyle}
+          center={center}
+          zoom={14}
+          onClick={handleMapClick}
+        >
+          {form.waypoints.map((pt, i) => (
+            <Marker
+              key={i}
+              position={pt}
+              label={`${i + 1}`}
+              draggable
+              onDragEnd={(e) => handleDrag(e, i)}
+              onRightClick={() => removeWaypoint(i)}
             />
-          </GoogleMap>
-        </LoadScript>
-        <div className="grid grid-cols-2 gap-2">
-          <Input
-            type="datetime-local"
-            className="[appearance:textfield]"
-            placeholder="Start Time"
-            value={flightForm.from}
-            onChange={(e) =>
-              setFlightForm({ ...flightForm, from: e.target.value })
-            }
+          ))}
+          <Polyline
+            path={form.waypoints}
+            options={{ strokeColor: '#007bff', strokeWeight: 2 }}
           />
+        </GoogleMap>
+      </LoadScript>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label>Drone</Label>
+          {dronesLoading ? (
+            <p>Loading...</p>
+          ) : drones && drones.length > 0 ? (
+            <p>{`${drones[0].brand} ${drones[0].model}`}</p>
+          ) : (
+            <p>No drones</p>
+          )}
+        </div>
+        <div>
+          <Label htmlFor="altitude">Altitude (m)</Label>
           <Input
-            type="datetime-local"
-            className="[appearance:textfield]"
-            placeholder="End Time"
-            value={flightForm.to}
-            onChange={(e) =>
-              setFlightForm({ ...flightForm, to: e.target.value })
-            }
-          />
-          <Input
+            id="altitude"
+            type="number"
             placeholder="Altitude (m)"
-            value={flightForm.altitude}
+            value={form.altitude_m}
             onChange={(e) =>
-              setFlightForm({ ...flightForm, altitude: e.target.value })
+              setForm((prev) => ({ ...prev, altitude_m: e.target.value }))
             }
           />
         </div>
-        <Textarea
-          placeholder="Notes"
-          value={flightForm.notes}
-          onChange={(e) =>
-            setFlightForm({ ...flightForm, notes: e.target.value })
-          }
-        />
-        <Button onClick={() => submitFlight.mutate()}>Submit</Button>
-      </Card>
+        <div>
+          <Label htmlFor="departure_time">Departure Time</Label>
+          <Input
+            id="departure_time"
+            type="datetime-local"
+            value={form.planned_departure_time}
+            onChange={(e) =>
+              setForm((prev) => ({
+                ...prev,
+                planned_departure_time: e.target.value,
+              }))
+            }
+          />
+        </div>
+        <div>
+          <Label htmlFor="arrival_time">Arrival Time</Label>
+          <Input
+            id="arrival_time"
+            type="datetime-local"
+            value={form.planned_arrival_time}
+            onChange={(e) =>
+              setForm((prev) => ({
+                ...prev,
+                planned_arrival_time: e.target.value,
+              }))
+            }
+          />
+        </div>
+      </div>
 
-      {/* Current Requests */}
-      <Card className="p-4">
-        <h2 className="font-medium mb-2">Current Requests</h2>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-left">
-              <th>Drone</th>
-              <th>Time</th>
-              <th>Status</th>
-              <th>Submitted</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {requests.map((r) => (
-              <tr key={r.id} className="border-t">
-                <td>{r.drone}</td>
-                <td>{r.time}</td>
-                <td>{r.status}</td>
-                <td>{r.submitted}</td>
-                <td>
-                  {r.status === 'APPROVED' && (
-                    <Button variant="outline" size="sm">
-                      Start Flight
-                    </Button>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </Card>
+      <Textarea
+        placeholder="Notes"
+        value={form.notes}
+        onChange={(e) =>
+          setForm((prev) => ({ ...prev, notes: e.target.value }))
+        }
+      />
+      <div className="flex justify-end space-x-2">
+        <Button variant="outline" onClick={onClose}>
+          Cancel
+        </Button>
+        <Button onClick={handleSubmit} disabled={mutation.isPending}>
+          {mutation.isPending ? 'Submitting...' : 'Submit'}
+        </Button>
+      </div>
     </div>
   )
 }

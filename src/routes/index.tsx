@@ -1,4 +1,6 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
+import { useEffect } from 'react'
+import { useUser } from '@/contexts/UserContext'
 // import logo from '../logo.svg'
 // import DroneRouteMap from '@/components/DroneRouteMap'
 
@@ -7,6 +9,39 @@ export const Route = createFileRoute('/')({
 })
 
 function App() {
+  const { user, isLoading } = useUser()
+  const navigate = useNavigate()
+  // Redirect logic
+  useEffect(() => {
+    if (isLoading) return
+    if (!user) {
+      navigate({ to: '/login' })
+      return
+    }
+    switch (user.role) {
+      case 'SOLO_PILOT':
+        navigate({ to: '/solo-pilot' })
+        break
+      case 'ORGANIZATION_PILOT':
+        navigate({ to: '/org-pilot' })
+        break
+      case 'ORGANIZATION_ADMIN':
+        navigate({ to: '/org-dashboard' })
+        break
+      case 'AUTHORITY_ADMIN':
+        navigate({ to: '/reg-authority/organizations' })
+        break
+      default:
+        navigate({ to: '/login' })
+    }
+  }, [user, isLoading, navigate])
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen text-xl">
+        Loading user info...
+      </div>
+    )
+  }
   const commonLinkStyle =
     'text-blue-600 hover:text-blue-800 visited:text-purple-600'
   return (

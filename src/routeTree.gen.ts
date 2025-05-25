@@ -13,6 +13,7 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
 import { Route as SoloPilotIndexImport } from './routes/solo-pilot/index'
+import { Route as RegAuthorityIndexImport } from './routes/reg-authority/index'
 import { Route as PilotRegistrationIndexImport } from './routes/pilot-registration/index'
 import { Route as OrgRegistrationIndexImport } from './routes/org-registration/index'
 import { Route as OrgPilotIndexImport } from './routes/org-pilot/index'
@@ -38,6 +39,12 @@ const IndexRoute = IndexImport.update({
 const SoloPilotIndexRoute = SoloPilotIndexImport.update({
   id: '/solo-pilot/',
   path: '/solo-pilot/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const RegAuthorityIndexRoute = RegAuthorityIndexImport.update({
+  id: '/reg-authority/',
+  path: '/reg-authority/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -223,6 +230,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PilotRegistrationIndexImport
       parentRoute: typeof rootRoute
     }
+    '/reg-authority/': {
+      id: '/reg-authority/'
+      path: '/reg-authority'
+      fullPath: '/reg-authority'
+      preLoaderRoute: typeof RegAuthorityIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/solo-pilot/': {
       id: '/solo-pilot/'
       path: '/solo-pilot'
@@ -250,6 +264,7 @@ export interface FileRoutesByFullPath {
   '/org-pilot': typeof OrgPilotIndexRoute
   '/org-registration': typeof OrgRegistrationIndexRoute
   '/pilot-registration': typeof PilotRegistrationIndexRoute
+  '/reg-authority': typeof RegAuthorityIndexRoute
   '/solo-pilot': typeof SoloPilotIndexRoute
 }
 
@@ -268,6 +283,7 @@ export interface FileRoutesByTo {
   '/org-pilot': typeof OrgPilotIndexRoute
   '/org-registration': typeof OrgRegistrationIndexRoute
   '/pilot-registration': typeof PilotRegistrationIndexRoute
+  '/reg-authority': typeof RegAuthorityIndexRoute
   '/solo-pilot': typeof SoloPilotIndexRoute
 }
 
@@ -287,6 +303,7 @@ export interface FileRoutesById {
   '/org-pilot/': typeof OrgPilotIndexRoute
   '/org-registration/': typeof OrgRegistrationIndexRoute
   '/pilot-registration/': typeof PilotRegistrationIndexRoute
+  '/reg-authority/': typeof RegAuthorityIndexRoute
   '/solo-pilot/': typeof SoloPilotIndexRoute
 }
 
@@ -307,6 +324,7 @@ export interface FileRouteTypes {
     | '/org-pilot'
     | '/org-registration'
     | '/pilot-registration'
+    | '/reg-authority'
     | '/solo-pilot'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -324,6 +342,7 @@ export interface FileRouteTypes {
     | '/org-pilot'
     | '/org-registration'
     | '/pilot-registration'
+    | '/reg-authority'
     | '/solo-pilot'
   id:
     | '__root__'
@@ -341,6 +360,7 @@ export interface FileRouteTypes {
     | '/org-pilot/'
     | '/org-registration/'
     | '/pilot-registration/'
+    | '/reg-authority/'
     | '/solo-pilot/'
   fileRoutesById: FileRoutesById
 }
@@ -360,6 +380,7 @@ export interface RootRouteChildren {
   OrgPilotIndexRoute: typeof OrgPilotIndexRoute
   OrgRegistrationIndexRoute: typeof OrgRegistrationIndexRoute
   PilotRegistrationIndexRoute: typeof PilotRegistrationIndexRoute
+  RegAuthorityIndexRoute: typeof RegAuthorityIndexRoute
   SoloPilotIndexRoute: typeof SoloPilotIndexRoute
 }
 
@@ -378,6 +399,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrgPilotIndexRoute: OrgPilotIndexRoute,
   OrgRegistrationIndexRoute: OrgRegistrationIndexRoute,
   PilotRegistrationIndexRoute: PilotRegistrationIndexRoute,
+  RegAuthorityIndexRoute: RegAuthorityIndexRoute,
   SoloPilotIndexRoute: SoloPilotIndexRoute,
 }
 
@@ -405,6 +427,7 @@ export const routeTree = rootRoute
         "/org-pilot/",
         "/org-registration/",
         "/pilot-registration/",
+        "/reg-authority/",
         "/solo-pilot/"
       ]
     },
@@ -449,6 +472,9 @@ export const routeTree = rootRoute
     },
     "/pilot-registration/": {
       "filePath": "pilot-registration/index.tsx"
+    },
+    "/reg-authority/": {
+      "filePath": "reg-authority/index.tsx"
     },
     "/solo-pilot/": {
       "filePath": "solo-pilot/index.tsx"
