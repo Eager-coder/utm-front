@@ -1,8 +1,4 @@
-import axios, {
-  type AxiosInstance,
-  type AxiosRequestConfig,
-  type AxiosResponse,
-} from 'axios'
+import axios, { type AxiosInstance, type AxiosResponse } from 'axios'
 
 const createApiClient = (baseURL: string): AxiosInstance => {
   const client = axios.create({

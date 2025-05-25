@@ -2,7 +2,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
-import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -20,7 +19,7 @@ export const Route = createFileRoute('/reg-authority/')({
   component: RegulatoryDashboard,
 })
 
-const API_URL = import.meta.env.VITE_API_URL
+// const API_URL = import.meta.env.VITE_API_URL
 
 function RegulatoryDashboard() {
   const [view, setView] = useState<'org' | 'solo'>('org')

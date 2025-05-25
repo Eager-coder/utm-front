@@ -16,7 +16,7 @@ export const Route = createFileRoute('/org-dashboard/flights')({
 })
 
 function FlightPlansPage() {
-  const { data: flights = [], isPending } = useQuery({
+  const { data: flights = [] } = useQuery({
     queryKey: ['org-flights'],
     queryFn: async () => [
       {
