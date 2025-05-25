@@ -1,3 +1,4 @@
+import { RegAuthorityNavbar } from '@/components/RegAuthorityNavbar'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/reg-authority/')({
@@ -5,5 +6,9 @@ export const Route = createFileRoute('/reg-authority/')({
 })
 
 function RouteComponent() {
-  return <div>Hello "/reg-authority/"!</div>
+  return (
+    <div className="max-w-7xl mx-auto">
+      <RegAuthorityNavbar />
+    </div>
+  )
 }
